@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<color name="DKGRAY">#ff444444</color>
+	<color name="white">#FFFFFF</color>
+	<color name="half_transparent">#BB000000</color>
+	<color name="stubhub_blue">#1f4579</color>
+	<color name="translucent_black">#80000000</color>
+	<color name="transparent">#00000000</color>
+	
+</resources>

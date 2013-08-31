@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+
+	<com.paymentkit.views.CardNumEditText
+		style="@style/CheckoutAddCardField"
+		android:id="@+id/credit_card_no"
+		android:layout_width="wrap_content"
+		android:layout_height="50dp"
+		android:layout_gravity="center_vertical"
+		android:hint="1234 5678 9012 3456"
+		android:textSize="@dimen/checkout_input_field_text_size"
+		android:maxLength="19" />
+
+	<com.paymentkit.views.InterceptEditText
+		style="@style/CheckoutAddCardField"
+		android:id="@+id/last_four_digits"
+		android:editable="false"
+		android:focusable="false"
+		android:inputType="none"
+		android:layout_width="match_parent"
+		android:layout_height="50dp"
+		android:layout_gravity="center_vertical"
+		android:maxLength="19"
+		android:textSize="@dimen/checkout_input_field_text_size"
+		android:visibility="gone" />
+
+</merge>
