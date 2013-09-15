@@ -39,7 +39,7 @@ public class CardIcon extends FrameLayout {
 		mFrontFace.setScaleType(ScaleType.CENTER_INSIDE);
 		mBackFace.setScaleType(ScaleType.CENTER_INSIDE);
 
-		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 		addView(mBackFace, lp);
 		addView(mFrontFace, lp);
 

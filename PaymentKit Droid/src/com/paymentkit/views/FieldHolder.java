@@ -19,6 +19,11 @@ import com.paymentkit.ValidateCreditCard;
 import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.CardIcon.CardFace;
 
+/**
+ * 
+ * @author Brendan Weinstein
+ *
+ */
 public class FieldHolder extends RelativeLayout {
 	
 	public static int CVV_MAX_LENGTH = 3;
@@ -36,6 +41,22 @@ public class FieldHolder extends RelativeLayout {
 	private CardIcon mCardIcon;
 	private LinearLayout mExtraFields;
 	
+	public enum InputStyle { 
+		GINGERBREAD(R.drawable.edit_text), ICS_HOLO_LIGHT(R.drawable.edit_text_holo_light);
+		
+		int resId;
+		
+		InputStyle(int resId) {
+			this.resId = resId;
+		}
+		
+		int getResId() {
+			return resId;
+		}
+		
+	};
+	private InputStyle mInputStyle = InputStyle.ICS_HOLO_LIGHT;
+	
 	public FieldHolder(Context context) {
 		super(context);
 		setup();
@@ -45,6 +66,14 @@ public class FieldHolder extends RelativeLayout {
 		super(context, attrs);
 		setup();
 	}
+		
+	/*
+	 * Determines background style of the FieldHolder
+	 */
+	public void setInputStyle(InputStyle inputStyle) {
+		mInputStyle = inputStyle;
+		setNecessaryFields();
+	} 
 	
 	private void setup() {
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -69,7 +98,7 @@ public class FieldHolder extends RelativeLayout {
 		setFocusable(true);
 		setFocusableInTouchMode(true);
 		setClipChildren(false);
-		setBackground(getResources().getDrawable(R.drawable.edit_text_holo_light));
+		setBackgroundDrawable(getResources().getDrawable(mInputStyle.getResId()));
 	}
 	
 	private void setExtraFieldsAlpha() {
@@ -126,11 +155,11 @@ public class FieldHolder extends RelativeLayout {
 	}
 	
 	public interface CardEntryListener {
-		public void onComplete();
+		public void onCardNumberInputComplete();
 
 		public void onEdit();
 
-		public void onReEntry();
+		public void onCardNumberInputReEntry();
 
 		public void onCVVEntry();
 
@@ -149,7 +178,7 @@ public class FieldHolder extends RelativeLayout {
 
 	CardEntryListener mCardEntryListener = new CardEntryListener() {
 		@Override
-		public void onComplete() {
+		public void onCardNumberInputComplete() {
 			validateCard();
 		}
 
@@ -167,7 +196,7 @@ public class FieldHolder extends RelativeLayout {
 		}
 
 		@Override
-		public void onReEntry() {
+		public void onCardNumberInputReEntry() {
 			mCardIcon.flipTo(CardFace.FRONT);
 			AnimatorSet set = new AnimatorSet();
 
@@ -179,6 +208,8 @@ public class FieldHolder extends RelativeLayout {
 				public void onAnimationEnd(Animator anim) {
 					mExtraFields.setVisibility(View.GONE);
 					mCardHolder.destroyOverlay();
+					mCardHolder.getCardField().requestFocus();
+					mCardHolder.getCardField().setSelection(mCardHolder.getCardField().length());
 				}
 			});
 

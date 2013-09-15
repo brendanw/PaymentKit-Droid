@@ -85,7 +85,7 @@ public class CardNumHolder extends RelativeLayout {
 			@Override
 			public void onClick(View v) {
 				if (mIsClickable) {
-					mCardEntryListener.onReEntry();
+					mCardEntryListener.onCardNumberInputReEntry();
 				}
 			}
 		});

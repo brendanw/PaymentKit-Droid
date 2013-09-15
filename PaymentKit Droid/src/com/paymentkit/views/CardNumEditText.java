@@ -66,7 +66,7 @@ public class CardNumEditText extends EditText {
 				setText(text);
 				setSelection(length());
 			} else if (l == mMaxCardLength && mTextAdded) {
-				mCardEntryListener.onComplete();
+				mCardEntryListener.onCardNumberInputComplete();
 			}
 		}
 
