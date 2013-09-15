@@ -91,7 +91,6 @@ public class FieldHolder extends RelativeLayout {
 		setExtraFieldsAlpha();
 		setCardEntryListeners();
 		setNecessaryFields();
-		//ViewUtils.setWidth(FieldHolder.this, (int) (CardFragment.INPUT_WIDTH * ViewUtils.getScreenWidth(getContext())));
 	}
 	
 	private void setNecessaryFields() {
