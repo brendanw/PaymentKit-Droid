@@ -6,7 +6,6 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
@@ -14,7 +13,6 @@ import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
 import com.paymentkit.views.FieldHolder.CardEntryListener;
-
 
 public class CardNumEditText extends EditText {
 
