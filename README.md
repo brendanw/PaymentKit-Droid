@@ -15,10 +15,10 @@ Feel free to leave requests and feedback through github (brendanw) or twitter (e
 
 You can also find my contact information at http://www.brendanweinstein.me
 
-Things to be added in the future:
--Documentation
--Better handling of spacing for landscape mode
--Support for more cards
--Removal of edittext assets and the addition of code for using default android edittext backgrounds
--Ability to move cursor anywhere in expiration date field.
--More error messaging ability options
+Things to be added in the future:<br>
+-Documentation<br>
+-Better handling of spacing for landscape mode<br>
+-Support for more cards<br>
+-Removal of edittext assets and the addition of code for using default android edittext backgrounds<br />
+-Ability to move cursor anywhere in expiration date field.<br />
+-More error messaging ability options<br />
