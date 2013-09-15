@@ -2,7 +2,7 @@ PaymentKit-Droid
 ================
 
 PaymentKit-Droid is an Open Source Android library that allows developers to create sleek payment forms like those made
-popular by StubHub, Stripe, Uber, and Postmates.
+popular by StubHub, Stripe, Uber, and Postmates. The library provides support for as far back as 2.1.
 
 The PKExample provides an example implementation pattern you may follow.
 
