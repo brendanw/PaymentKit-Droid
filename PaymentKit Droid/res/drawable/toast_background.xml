@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android" >
 
-	<stroke
-		android:width="2dp"
-		android:color="@color/stubhub_blue" />
+    <corners android:radius="15px" />
 
-	<solid android:color="@color/half_transparent" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/stubhub_blue" />
 
-	<corners android:radius="15px" />
-
-	<padding
-		android:bottom="0dp"
-		android:left="0dp"
-		android:right="0dp"
-		android:top="0dp" />
+    <solid android:color="@color/half_transparent" />
 
 </shape>

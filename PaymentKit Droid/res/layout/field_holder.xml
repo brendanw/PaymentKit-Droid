@@ -3,7 +3,7 @@
 
     <com.paymentkit.views.CardNumHolder
         android:id="@+id/card_num_holder"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:layout_marginLeft="10dp"

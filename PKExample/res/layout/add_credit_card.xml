@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:background="#e8e8e5" >
 
     <RelativeLayout
         android:id="@+id/header"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:background="@drawable/checkout_header_gradient" >
 
@@ -23,19 +23,19 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="fill_parent"
             android:layout_alignParentRight="true"
             android:orientation="horizontal" >
 
             <View
                 android:layout_width="1px"
-                android:layout_height="match_parent"
+                android:layout_height="fill_parent"
                 android:background="#f0eded" />
 
             <Button
                 android:id="@+id/save_btn"
                 android:layout_width="60dp"
-                android:layout_height="match_parent"
+                android:layout_height="fill_parent"
                 android:background="@drawable/checkout_next_btn_bg"
                 android:text="Save"
                 android:textColor="@color/white"
@@ -57,7 +57,7 @@
 
     <com.paymentkit.views.FieldHolder
         android:id="@+id/field_holder"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:layout_below="@id/accepted_cards"
         android:layout_centerHorizontal="true"

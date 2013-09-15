@@ -17,7 +17,7 @@
 		android:editable="false"
 		android:focusable="false"
 		android:inputType="none"
-		android:layout_width="match_parent"
+		android:layout_width="fill_parent"
 		android:layout_height="50dp"
 		android:layout_gravity="center_vertical"
 		android:maxLength="19"
