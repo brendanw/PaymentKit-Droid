@@ -6,6 +6,11 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
 import com.paymentkit.views.FieldHolder.CardEntryListener;
@@ -51,23 +56,33 @@ public class CardNumEditText extends EditText {
 	/* Card Number Input Field Text Watcher */
 	private boolean mTextAdded = true;
 	private int mPrevLength = 0;
+	enum TextEvent { KEY_PRESS, FORMATTER };
+	private TextEvent mLastEvent = TextEvent.KEY_PRESS;
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		mLastEvent = TextEvent.KEY_PRESS;
+		return super.onKeyDown(keyCode, event);
+	}
 
 	TextWatcher mCardNumberTextWatcher = new TextWatcher() {
 		@Override
 		public void afterTextChanged(Editable s) {
 			setTextColor(Color.DKGRAY);
 			mCardEntryListener.onEdit();
-			int l = length();
-			if ((l == 4 || l == 9 || l == 14) && mTextAdded) {
-				setText(getText() + " ");
-				setSelection(l + 1);
-			} else if ((l == 5 || l == 10 || l == 15) && mTextAdded && getText().charAt(length() - 1) != ' ') {
-				String text = getText().subSequence(0, length() - 1) + " " + getText().charAt(length() - 1);
-				setText(text);
-				setSelection(length());
-			} else if (l == mMaxCardLength && mTextAdded) {
+			if(length() == mMaxCardLength && mTextAdded) {
 				mCardEntryListener.onCardNumberInputComplete();
 			}
+			if(mLastEvent == TextEvent.KEY_PRESS) {
+				int curPos = getSelectionEnd();
+				format16Text(getText().toString().replaceAll(" ", ""));
+				if(mTextAdded && (curPos == 4 || curPos == 9 || curPos == 14)) {
+					setSelection(curPos+1);
+				} else {
+					setSelection(curPos);
+				}
+			}
+			
 		}
 
 		@Override
@@ -84,6 +99,57 @@ public class CardNumEditText extends EditText {
 			}
 		}
 	};
+	
+	private void format16Text(String strippedStr) {
+		int len = strippedStr.length();
+		StringBuilder sb = new StringBuilder();
+		for(int lh=1; lh <= len; lh++) {
+			sb.append(strippedStr.charAt(lh-1));
+			if(lh % 4 == 0 && lh < 16) {
+				sb.append(" ");
+			}
+		}
+		mLastEvent = TextEvent.FORMATTER;
+		setText(sb.toString());
+	}
+	
+	@Override
+	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+		return new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
+	}
+	
+	private class ZanyInputConnection extends InputConnectionWrapper {
+
+		public ZanyInputConnection(InputConnection target, boolean mutable) {
+			super(target, mutable);
+		}
+
+		@Override
+		public boolean sendKeyEvent(KeyEvent event) {
+			if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+				int curPos = getSelectionEnd();
+				mLastEvent = TextEvent.KEY_PRESS;
+				if(curPos == 5 || curPos == 10 || curPos == 15) {
+					CardNumEditText.this.setSelection(curPos-1);
+					return true;
+				}
+			}
+			return super.sendKeyEvent(event);
+		}
+
+		@Override
+		public boolean deleteSurroundingText(int beforeLength, int afterLength) {
+			// magic: in latest Android, deleteSurroundingText(1, 0) will be
+			// called for backspace
+			if (beforeLength == 1 && afterLength == 0) {
+				// backspace
+				return sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
+						&& sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
+			}
+
+			return super.deleteSurroundingText(beforeLength, afterLength);
+		}
+	}
 
 	public String getLast4Digits() {
 		String text = getText().toString().replaceAll("\\s", "");
