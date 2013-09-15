@@ -28,7 +28,7 @@ public class FieldHolder extends RelativeLayout {
 	
 	public static int CVV_MAX_LENGTH = 3;
 	
-	protected static final int AMEX_CARD_LENGTH = 18;
+	protected static final int AMEX_CARD_LENGTH = 17;
 	public static final int NON_AMEX_CARD_LENGTH = 19;
 	
 	private static final int RE_ENTRY_ALPHA_OUT_DURATION = 100;

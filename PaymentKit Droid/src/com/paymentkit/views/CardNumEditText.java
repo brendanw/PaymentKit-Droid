@@ -1,11 +1,13 @@
 package com.paymentkit.views;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
@@ -39,7 +41,7 @@ public class CardNumEditText extends EditText {
 	public void setCardEntryListener(CardEntryListener listener) {
 		mCardEntryListener = listener;
 	}
-	
+
 	public int getMaxCardLength() {
 		return mMaxCardLength;
 	}
@@ -54,13 +56,22 @@ public class CardNumEditText extends EditText {
 	/* Card Number Input Field Text Watcher */
 	private boolean mTextAdded = true;
 	private int mPrevLength = 0;
-	enum TextEvent { KEY_PRESS, FORMATTER };
+
+	enum TextEvent {
+		KEY_PRESS, FORMATTER
+	};
+
 	private TextEvent mLastEvent = TextEvent.KEY_PRESS;
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		mLastEvent = TextEvent.KEY_PRESS;
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	public void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
 	}
 
 	TextWatcher mCardNumberTextWatcher = new TextWatcher() {
@@ -68,19 +79,38 @@ public class CardNumEditText extends EditText {
 		public void afterTextChanged(Editable s) {
 			setTextColor(Color.DKGRAY);
 			mCardEntryListener.onEdit();
-			if(length() == mMaxCardLength && mTextAdded) {
+			if (length() == mMaxCardLength && mTextAdded) {
 				mCardEntryListener.onCardNumberInputComplete();
 			}
-			if(mLastEvent == TextEvent.KEY_PRESS) {
+			if (mLastEvent == TextEvent.KEY_PRESS) {
 				int curPos = getSelectionEnd();
-				format16Text(getText().toString().replaceAll(" ", ""));
-				if(mTextAdded && (curPos == 4 || curPos == 9 || curPos == 14)) {
-					setSelection(curPos+1);
+				formatText(getText().toString().replaceAll(" ", ""));
+				positionCursor(curPos);
+			}
+		}
+		
+		private void formatText(String strippedStr) {
+			if(mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH) {
+				format16Text(strippedStr);
+			} else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH) {
+				format15Text(strippedStr);
+			}
+		}
+
+		private void positionCursor(int curPos) {
+			if (mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH) {
+				if (mTextAdded && (curPos == 4 || curPos == 9 || curPos == 14)) {
+					setSelection(curPos + 1);
+				} else {
+					setSelection(curPos);
+				}
+			} else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH) {
+				if (mTextAdded && (curPos == 4 || curPos == 11)) {
+					setSelection(curPos + 1);
 				} else {
 					setSelection(curPos);
 				}
 			}
-			
 		}
 
 		@Override
@@ -97,25 +127,44 @@ public class CardNumEditText extends EditText {
 			}
 		}
 	};
-	
+
+	/*
+	 * 4-4-4-4
+	 */
 	private void format16Text(String strippedStr) {
 		int len = strippedStr.length();
 		StringBuilder sb = new StringBuilder();
-		for(int lh=1; lh <= len; lh++) {
-			sb.append(strippedStr.charAt(lh-1));
-			if(lh % 4 == 0 && lh < 16) {
+		for (int lh = 1; lh <= len; lh++) {
+			sb.append(strippedStr.charAt(lh - 1));
+			if (lh % 4 == 0 && lh < 16) {
 				sb.append(" ");
 			}
 		}
 		mLastEvent = TextEvent.FORMATTER;
 		setText(sb.toString());
 	}
-	
+
+	/*
+	 * 4-6-5
+	 */
+	private void format15Text(String strippedStr) {
+		int len = strippedStr.length();
+		StringBuilder sb = new StringBuilder();
+		for(int lh=1; lh <= len; lh++) {
+			sb.append(strippedStr.charAt(lh-1));
+			if(lh == 4 || lh == 10) {
+				sb.append(" ");
+			}
+		}
+		mLastEvent = TextEvent.FORMATTER;
+		setText(sb.toString());
+	}
+
 	@Override
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
 		return new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
 	}
-	
+
 	private class ZanyInputConnection extends InputConnectionWrapper {
 
 		public ZanyInputConnection(InputConnection target, boolean mutable) {
@@ -127,8 +176,11 @@ public class CardNumEditText extends EditText {
 			if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
 				int curPos = getSelectionEnd();
 				mLastEvent = TextEvent.KEY_PRESS;
-				if(curPos == 5 || curPos == 10 || curPos == 15) {
-					CardNumEditText.this.setSelection(curPos-1);
+				if (mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH && (curPos == 5 || curPos == 10 || curPos == 15)) {
+					CardNumEditText.this.setSelection(curPos - 1);
+					return true;
+				} else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH && (curPos == 5 || curPos == 12)) {
+					CardNumEditText.this.setSelection(curPos - 1);
 					return true;
 				}
 			}
