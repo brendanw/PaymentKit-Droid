@@ -15,6 +15,12 @@ import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder;
 import com.paymentkit.views.FieldHolder.InputStyle;
 
+/**
+ * 
+ * @author Brendan Weinstein
+ * http://www.brendanweinstein.me
+ *
+ */
 public class PKFragment extends Fragment {
 
 	private final static String TAG = PKFragment.class.getSimpleName();
