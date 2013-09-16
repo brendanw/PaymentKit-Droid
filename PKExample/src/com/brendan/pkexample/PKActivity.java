@@ -5,6 +5,12 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Window;
 
+/**
+ * 
+ * @author Brendan Weinstein
+ * http://www.brendanweinstein.me
+ *
+ */
 public class PKActivity extends FragmentActivity {
 	
 	@Override

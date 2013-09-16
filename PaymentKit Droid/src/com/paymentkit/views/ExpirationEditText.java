@@ -16,8 +16,9 @@ import com.paymentkit.views.FieldHolder.CardEntryListener;
 
 /**
  * 
- * @author bweinstein
- * 
+ * @author Brendan Weinstein
+ * http://www.brendanweinstein.me
+ *
  */
 public class ExpirationEditText extends EditText {
 
