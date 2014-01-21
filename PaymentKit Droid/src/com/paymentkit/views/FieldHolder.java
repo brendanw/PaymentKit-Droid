@@ -66,6 +66,26 @@ public class FieldHolder extends RelativeLayout {
 		super(context, attrs);
 		setup();
 	}
+	
+	public CVVEditText getCVVEditText() {
+		return mCVVEditText;
+	}
+	
+	public CardIcon getCardIcon() {
+		return mCardIcon;
+	}
+	
+	public ExpirationEditText getExpirationEditText() {
+		return mExpirationEditText;
+	}
+	
+	public CardNumHolder getCardNumHolder() {
+		return mCardHolder;
+	}
+	
+	public void lockCardNumField() {
+		transitionToExtraFields();
+	}
 		
 	/*
 	 * Determines background style of the FieldHolder
