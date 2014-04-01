@@ -63,12 +63,6 @@ public class CardNumEditText extends EditText {
 	private TextEvent mLastEvent = TextEvent.KEY_PRESS;
 
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		mLastEvent = TextEvent.KEY_PRESS;
-		return super.onKeyDown(keyCode, event);
-	}
-	
-	@Override
 	public void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 	}
@@ -86,6 +80,9 @@ public class CardNumEditText extends EditText {
 				formatText(getText().toString().replaceAll(" ", ""));
 				positionCursor(curPos);
 			}
+			if (mLastEvent != TextEvent.KEY_PRESS) {
+                		mLastEvent = TextEvent.KEY_PRESS;
+        		}
 		}
 		
 		private void formatText(String strippedStr) {
