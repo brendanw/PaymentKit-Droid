@@ -27,19 +27,20 @@ package com.paymentkit;
 
 import static java.lang.System.out;
 
-
-
 /**
- * Handles calculations to validate credit card numbers and determine which credit card company they belong to.
+ * Handles calculations to validate credit card numbers and determine which
+ * credit card company they belong to.
  * 
- * 1. if a credit card number is valid
- * 2. which credit card vendor handles that number.
+ * 1. if a credit card number is valid 2. which credit card vendor handles that
+ * number.
  * 
- * It validates the prefix and the checkdigit. It does not* contact the credit card company to ensure that number has actually been issued and that
- * the account is in good standing.
+ * It validates the prefix and the checkdigit. It does not* contact the credit
+ * card company to ensure that number has actually been issued and that the
+ * account is in good standing.
  * 
- * It will also tell you which of the following credit card companies issued the card: Amex, Diners Club, Carte Blanche, Discover, enRoute, JCB,
- * MasterCard or Visa.
+ * It will also tell you which of the following credit card companies issued the
+ * card: Amex, Diners Club, Carte Blanche, Discover, enRoute, JCB, MasterCard or
+ * Visa.
  * 
  * @author Roedy Green, Canadian Mind Products
  * @version 1.3 1999-08-19 ignore dashes in numbers
@@ -61,14 +62,16 @@ public final class ValidateCreditCard {
 	private static int cachedLastFind;
 
 	/**
-	 * ranges of credit card number that belong to each company. buildRanges initialises.
+	 * ranges of credit card number that belong to each company. buildRanges
+	 * initialises.
 	 */
 	private static LCR[] ranges;
 
 	// -------------------------- PUBLIC STATIC METHODS --------------------------
 
 	/**
-	 * Determine if the credit card number is valid, i.e. has good prefix and checkdigit. Does _not_ ask the credit card company if this card has been
+	 * Determine if the credit card number is valid, i.e. has good prefix and
+	 * checkdigit. Does _not_ ask the credit card company if this card has been
 	 * issued or is in good standing.
 	 * 
 	 * @param creditCardNumber
@@ -84,10 +87,13 @@ public final class ValidateCreditCard {
 			{
 				// there is a checkdigit to be validated
 				/*
-				 * Manual method MOD 10 checkdigit 706-511-227 7 0 6 5 1 1 2 2 7 2 * 2 * 2 * 2 --------------------------------- 7 + 0 + 6 +1+0+ 1 + 2 + 2 + 4
-				 * = 23 23 MOD 10 = 3 10 - 3 = 7 -- the check digit Note digits of multiplication results must be added before sum. Computer Method MOD 10
-				 * checkdigit 706-511-227 7 0 6 5 1 1 2 2 7 Z Z Z Z --------------------------------- 7 + 0 + 6 + 1 + 1 + 2 + 2 + 4 + 7 = 30 30 MOD 10 had
-				 * better = 0
+				 * Manual method MOD 10 checkdigit 706-511-227 7 0 6 5 1 1 2 2 7 2 * 2 *
+				 * 2 * 2 --------------------------------- 7 + 0 + 6 +1+0+ 1 + 2 + 2 + 4
+				 * = 23 23 MOD 10 = 3 10 - 3 = 7 -- the check digit Note digits of
+				 * multiplication results must be added before sum. Computer Method MOD
+				 * 10 checkdigit 706-511-227 7 0 6 5 1 1 2 2 7 Z Z Z Z
+				 * --------------------------------- 7 + 0 + 6 + 1 + 1 + 2 + 2 + 4 + 7 =
+				 * 30 30 MOD 10 had better = 0
 				 */
 				long number = creditCardNumber;
 				int checksum = 0;
@@ -106,15 +112,16 @@ public final class ValidateCreditCard {
 						break;
 					}
 				}// end for
-				// good checksum should be 0 mod 10
+					// good checksum should be 0 mod 10
 				return (checksum % 10) == 0;
 			}
 		}
 	}
-	
+
 	public static CardType getCardType(String number) {
 		number = number.replaceAll(" ", "");
-		if(number.toString().length() < 2) return CardType.UNKNOWN_CARD;
+		if (number.toString().length() < 2)
+			return CardType.UNKNOWN_CARD;
 		String firstChars = number.toString().substring(0, 2);
 		int range = Integer.parseInt(firstChars);
 		if (range >= 40 && range <= 49) {
@@ -125,7 +132,10 @@ public final class ValidateCreditCard {
 			return CardType.AMERICAN_EXPRESS;
 		} else if (range == 60 || range == 62 || range == 64 || range == 65) {
 			return CardType.DISCOVER;
-			
+		} else if (range == 35) {
+			return CardType.JCB;
+		} else if (range == 30 || range == 36 || range == 38 || range == 39) {
+			return CardType.DINERS_CLUB;
 		} else {
 			return CardType.UNKNOWN_CARD;
 		}
@@ -137,7 +147,8 @@ public final class ValidateCreditCard {
 	 * @param creditCardNumber
 	 *          number on card.
 	 * 
-	 * @return index of matching range, or NOT_ENOUGH_DIGITS or UNKNOWN_VENDOR on failure.
+	 * @return index of matching range, or NOT_ENOUGH_DIGITS or UNKNOWN_VENDOR on
+	 *         failure.
 	 */
 	public static CardType matchCardType(long creditCardNumber) {
 		if (creditCardNumber < 1000000000000L) {
@@ -161,13 +172,15 @@ public final class ValidateCreditCard {
 	}// end matchVendor
 
 	/**
-	 * convert a String to a long. The routine is very forgiving. It ignores invalid chars, lead trail, embedded spaces, decimal points etc, AND minus
+	 * convert a String to a long. The routine is very forgiving. It ignores
+	 * invalid chars, lead trail, embedded spaces, decimal points etc, AND minus
 	 * signs.
 	 * 
 	 * @param numStr
 	 *          the String containing the number to be converted to long.
 	 * 
-	 * @return long value of the string found, ignoring junk characters. May be negative.
+	 * @return long value of the string found, ignoring junk characters. May be
+	 *         negative.
 	 * @throws NumberFormatException
 	 *           if the number is too big to fit in a long.
 	 * @see com.mindprod.common11.ST#parseDirtyLong(String)
@@ -208,7 +221,8 @@ public final class ValidateCreditCard {
 	// 1800 15 mod 10
 
 	/**
-	 * Convert a creditCardNumber as long to a formatted String. Currently it breaks 16-digit numbers into groups of 4.
+	 * Convert a creditCardNumber as long to a formatted String. Currently it
+	 * breaks 16-digit numbers into groups of 4.
 	 * 
 	 * @param creditCardNumber
 	 *          number on card.
@@ -324,7 +338,8 @@ public final class ValidateCreditCard {
 			out.println(toPrettyString(3000000000000005L));// 3000 0000 0000 0005
 			out.println(toPrettyString(13000000000000005L));// 1 3000 0000 0000 0005
 			out.println(CardType.VISA.getName());// Visa
-			out.println(CardType.UNKNOWN_CARD.getName());// Error: unknown credit card company
+			out.println(CardType.UNKNOWN_CARD.getName());// Error: unknown credit card
+																										// company
 		}// end if debugging
 	}// end main
 }
@@ -350,7 +365,8 @@ final class LCR {
 	 */
 	public final long low;
 
-	// -------------------------- PUBLIC INSTANCE METHODS --------------------------
+	// -------------------------- PUBLIC INSTANCE METHODS
+	// --------------------------
 
 	/**
 	 * public constructor
@@ -368,5 +384,3 @@ final class LCR {
 		this.cardType = cardType;
 	}// end public constructor
 }
-
-

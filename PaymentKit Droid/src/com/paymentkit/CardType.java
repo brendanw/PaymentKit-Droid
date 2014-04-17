@@ -5,9 +5,11 @@ public enum CardType {
 	MASTERCARD(2, "Mastercard", false, 3), 
 	AMERICAN_EXPRESS(3, "American Express", false, 4),
 	DISCOVER(4,"Discover", false, 3),
-	UNKNOWN_CARD(5, "Unknown", true, 3),
-	TOO_MANY_DIGITS(6, "Too Many Digits", true, 3),
-	NOT_ENOUGH_DIGITS(7, "Not Enough Digits", true, 3);
+	JCB(5, "JCB", false, 3),
+	DINERS_CLUB(6, "Diners Club", false, 3),
+	UNKNOWN_CARD(7, "Unknown", true, 3),
+	TOO_MANY_DIGITS(8, "Too Many Digits", true, 3),
+	NOT_ENOUGH_DIGITS(9, "Not Enough Digits", true, 3);
 
 	private int mVal;
 	private String mName;
