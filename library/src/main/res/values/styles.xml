@@ -1,0 +1,8 @@
+<resources>
+	<style name="CheckoutAddCardField">
+		<item name="android:textSize">16sp</item>
+		<item name="android:inputType">number</item>
+		<item name="android:background">@null</item>
+	</style>
+
+</resources>
