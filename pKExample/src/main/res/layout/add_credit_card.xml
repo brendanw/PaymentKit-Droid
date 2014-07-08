@@ -38,7 +38,7 @@
                 android:layout_height="fill_parent"
                 android:background="@drawable/checkout_next_btn_bg"
                 android:text="Save"
-                android:textColor="@color/white"
+                android:textColor="@color/pK_white"
                 android:textSize="17sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -53,7 +53,7 @@
         android:layout_marginTop="15dp"
         android:antialias="true"
         android:scaleType="fitXY"
-        android:src="@drawable/checkout_payment_icons" />
+        android:src="@drawable/pk_payment_icons" />
 
     <com.paymentkit.views.FieldHolder
         android:id="@+id/field_holder"
