@@ -7,6 +7,6 @@
         android:width="2dp"
         android:color="@color/stubhub_blue" />
 
-    <solid android:color="@color/half_transparent" />
+    <solid android:color="@color/pK_half_transparent" />
 
 </shape>

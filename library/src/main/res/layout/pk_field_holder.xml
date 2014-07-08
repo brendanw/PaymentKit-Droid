@@ -18,7 +18,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="0dp"
         android:scaleType="centerInside"
-        android:src="@drawable/checkout_default_card" />
+        android:src="@drawable/pk_default_card" />
 
     <LinearLayout
         android:id="@+id/extra_fields"
@@ -30,21 +30,21 @@
 
         <com.paymentkit.views.ExpirationEditText
             android:id="@+id/expiration"
-            style="@style/CheckoutAddCardField"
+            style="@style/pK_CheckoutAddCardField"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:contentDescription="@string/expiration_field_desc"
-            android:hint="@string/expiration_field_hint"
+            android:contentDescription="@string/pK_expiration_field_desc"
+            android:hint="@string/pK_expiration_field_hint"
             android:imeOptions="actionNext"
             android:inputType="number"
             android:maxLength="5"
-            android:textSize="@dimen/checkout_input_field_text_size"
-            android:color="@color/DKGRAY" />
+            android:textSize="@dimen/pK_checkout_input_field_text_size"
+            android:color="@color/pK_DKGRAY" />
 
         <com.paymentkit.views.CVVEditText
             android:id="@+id/security_code"
-            style="@style/CheckoutAddCardField"
+            style="@style/pK_CheckoutAddCardField"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_gravity="center"
@@ -55,8 +55,8 @@
             android:inputType="number"
             android:maxLength="3"
             android:nextFocusRight="@null"
-            android:textSize="@dimen/checkout_input_field_text_size"
-            android:color="@color/DKGRAY" />
+            android:textSize="@dimen/pK_checkout_input_field_text_size"
+            android:color="@color/pK_DKGRAY" />
     </LinearLayout>
 
 </merge>
