@@ -97,7 +97,7 @@ public class FieldHolder extends RelativeLayout {
 	
 	private void setup() {
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		inflater.inflate(R.layout.field_holder, this, true);
+		inflater.inflate(R.layout.pk_field_holder, this, true);
 		mCardHolder = (CardNumHolder) findViewById(R.id.card_num_holder);
 		mCardIcon = (CardIcon) findViewById(R.id.card_icon);
 		mExtraFields = (LinearLayout) findViewById(R.id.extra_fields);

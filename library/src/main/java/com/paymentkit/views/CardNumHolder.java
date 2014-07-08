@@ -52,7 +52,7 @@ public class CardNumHolder extends RelativeLayout {
 	private void setup() {
 		setClipChildren(false);
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		inflater.inflate(R.layout.card_holder, this, true);
+		inflater.inflate(R.layout.pk_card_holder, this, true);
 		mCardNumberEditText = (CardNumEditText) findViewById(R.id.credit_card_no);
 		mLastFourDigits = (InterceptEditText) findViewById(R.id.last_four_digits);
 		mTopItem = mLastFourDigits;
@@ -60,13 +60,13 @@ public class CardNumHolder extends RelativeLayout {
 
 	public boolean isCardNumValid() {
 		if (mCardNumberEditText.length() < mCardNumberEditText.getMaxCardLength()) {
-			ToastUtils.showToast(getContext(), getResources().getString(R.string.error_invalid_card_no));
+			ToastUtils.showToast(getContext(), getResources().getString(R.string.pK_error_invalid_card_no));
 			return false;
 		} else if (mCardNumberEditText.length() == mCardNumberEditText.getMaxCardLength()) {
 			if (ValidateCreditCard.isValid(Long.parseLong(getCardField().getText().toString().replaceAll("\\s", "")))) {
 				return true;
 			} else {
-				ToastUtils.showToast(getContext(), getResources().getString(R.string.error_invalid_card_no));
+				ToastUtils.showToast(getContext(), getResources().getString(R.string.pK_error_invalid_card_no));
 			}
 		}
 		return false;
