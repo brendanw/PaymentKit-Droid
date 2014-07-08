@@ -57,6 +57,3 @@ release.properties
 com_crashlytics_export_strings.xml
 crashlytics-build.properties
 
-# Misc
-*release*.jks
-Private.java
