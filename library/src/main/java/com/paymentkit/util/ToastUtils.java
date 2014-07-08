@@ -47,7 +47,7 @@ public class ToastUtils {
 
 	private static Toast makeToast(Activity activity, String text, int duration) {
 		LayoutInflater inflater = activity.getLayoutInflater();
-		View layout = inflater.inflate(R.layout.toast, (ViewGroup) activity.findViewById(R.id.toast_layout_root));
+		View layout = inflater.inflate(R.layout.pk_toast, (ViewGroup) activity.findViewById(R.id.toast_layout_root));
 		TextView textView = (TextView) layout.findViewById(R.id.text);
 		textView.setText(text);
 		Toast toast = new Toast(activity);
