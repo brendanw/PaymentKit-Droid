@@ -26,6 +26,7 @@
         android:layout_height="50dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:addStatesFromChildren="true"
         android:orientation="horizontal" >
 
         <com.paymentkit.views.ExpirationEditText

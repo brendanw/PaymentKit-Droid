@@ -41,22 +41,6 @@ public class FieldHolder extends RelativeLayout {
 	private CardIcon mCardIcon;
 	private LinearLayout mExtraFields;
 	
-	public enum InputStyle { 
-		GINGERBREAD(R.drawable.edit_text), ICS_HOLO_LIGHT(R.drawable.edit_text_holo_light);
-		
-		int resId;
-		
-		InputStyle(int resId) {
-			this.resId = resId;
-		}
-		
-		int getResId() {
-			return resId;
-		}
-		
-	};
-	private InputStyle mInputStyle = InputStyle.ICS_HOLO_LIGHT;
-	
 	public FieldHolder(Context context) {
 		super(context);
 		setup();
@@ -86,14 +70,6 @@ public class FieldHolder extends RelativeLayout {
 	public void lockCardNumField() {
 		transitionToExtraFields();
 	}
-		
-	/*
-	 * Determines background style of the FieldHolder
-	 */
-	public void setInputStyle(InputStyle inputStyle) {
-		mInputStyle = inputStyle;
-		setNecessaryFields();
-	} 
 	
 	private void setup() {
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -114,10 +90,8 @@ public class FieldHolder extends RelativeLayout {
 	}
 	
 	private void setNecessaryFields() {
-		setFocusable(true);
-		setFocusableInTouchMode(true);
 		setClipChildren(false);
-		setBackgroundDrawable(getResources().getDrawable(mInputStyle.getResId()));
+        setAddStatesFromChildren(true);
 	}
 	
 	private void setExtraFieldsAlpha() {

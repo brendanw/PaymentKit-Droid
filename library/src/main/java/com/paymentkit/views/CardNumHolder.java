@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.CycleInterpolator;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorListenerAdapter;
@@ -18,7 +18,7 @@ import com.paymentkit.util.ToastUtils;
 import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
-public class CardNumHolder extends RelativeLayout {
+public class CardNumHolder extends FrameLayout {
 
 	private static final String TAG = CardNumHolder.class.getSimpleName();
 
@@ -51,6 +51,7 @@ public class CardNumHolder extends RelativeLayout {
 
 	private void setup() {
 		setClipChildren(false);
+        setAddStatesFromChildren(true);
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.pk_card_holder, this, true);
 		mCardNumberEditText = (CardNumEditText) findViewById(R.id.credit_card_no);
