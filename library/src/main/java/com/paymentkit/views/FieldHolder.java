@@ -185,7 +185,7 @@ public class FieldHolder extends RelativeLayout {
 				mCardHolder.getCardField().setMaxCardLength(NON_AMEX_CARD_LENGTH);
 				setCVVMaxLength(3);
 			}
-			mCardIcon.setCardType(ValidateCreditCard.getCardType(mCardHolder.getCardField().getText().toString()));
+			mCardIcon.setCardType(newCardType);
 		}
 
 		@Override

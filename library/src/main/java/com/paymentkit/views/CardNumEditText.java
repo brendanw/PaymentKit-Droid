@@ -13,6 +13,7 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
+import com.paymentkit.ValidateCreditCard;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
 public class CardNumEditText extends EditText {
@@ -76,37 +77,31 @@ public class CardNumEditText extends EditText {
 				mCardEntryListener.onCardNumberInputComplete();
 			}
 			if (mLastEvent == TextEvent.KEY_PRESS) {
-				int curPos = getSelectionEnd();
-				formatText(getText().toString().replaceAll(" ", ""));
-				positionCursor(curPos);
+				int previousCursorPosition = getSelectionEnd();
+                // Remove our selves while we edit this text.
+                removeTextChangedListener(this);
+                formatText(s);
+                addTextChangedListener(this);
+
+                positionCursor(s, previousCursorPosition);
 			}
 			if (mLastEvent != TextEvent.KEY_PRESS) {
                 		mLastEvent = TextEvent.KEY_PRESS;
-        		}
-		}
-		
-		private void formatText(String strippedStr) {
-			if(mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH) {
-				format16Text(strippedStr);
-			} else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH) {
-				format15Text(strippedStr);
-			}
+            }
 		}
 
-		private void positionCursor(int curPos) {
-			if (mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH) {
-				if (mTextAdded && (curPos == 4 || curPos == 9 || curPos == 14)) {
-					setSelection(curPos + 1);
-				} else {
-					setSelection(curPos);
-				}
-			} else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH) {
-				if (mTextAdded && (curPos == 4 || curPos == 11)) {
-					setSelection(curPos + 1);
-				} else {
-					setSelection(curPos);
-				}
-			}
+        /** This fixes the awkwardness when the user adds or deletes around a space. **/
+		private void positionCursor(Editable s, int oldPos) {
+            String str = s.toString();
+            int newPos = getSelectionEnd();
+            String selected =  newPos > 0 ? str.substring(newPos - 1, newPos) : "";
+            if (oldPos == newPos && " ".equals(selected)) {
+                if (mTextAdded) {
+                    setSelection(newPos + 1);
+                } else {
+                    setSelection(newPos - 1);
+                }
+            }
 		}
 
 		@Override
@@ -124,36 +119,53 @@ public class CardNumEditText extends EditText {
 		}
 	};
 
-	/*
-	 * 4-4-4-4
-	 */
-	private void format16Text(String strippedStr) {
+    private void formatText(Editable editable) {
+        String newString = null;
+        String strippedString = ValidateCreditCard.removeNonNumbers(editable.toString());
+        if(mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH) {
+            newString = format16Text(strippedString);
+        } else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH) {
+            newString = format15Text(strippedString);
+        }
+
+        mLastEvent = TextEvent.FORMATTER;
+        if (newString != null) {
+            InputFilter[] filters = editable.getFilters();
+            editable.setFilters(new InputFilter[] { });
+            // We need to remove filters so we can add text with spaces.
+            editable.replace(0, editable.length(), newString);
+            editable.setFilters(filters);
+        }
+    }
+
+    /*
+     * 4-4-4-4
+     */
+    private String format16Text(String strippedStr) {
 		int len = strippedStr.length();
 		StringBuilder sb = new StringBuilder();
 		for (int lh = 1; lh <= len; lh++) {
 			sb.append(strippedStr.charAt(lh - 1));
-			if (lh % 4 == 0 && lh < 16) {
+			if (lh % 4 == 0 && lh < 16 && lh != len) {
 				sb.append(" ");
 			}
 		}
-		mLastEvent = TextEvent.FORMATTER;
-		setText(sb.toString());
+		return sb.toString();
 	}
 
 	/*
 	 * 4-6-5
 	 */
-	private void format15Text(String strippedStr) {
+	private String format15Text(String strippedStr) {
 		int len = strippedStr.length();
 		StringBuilder sb = new StringBuilder();
 		for(int lh=1; lh <= len; lh++) {
 			sb.append(strippedStr.charAt(lh-1));
-			if(lh == 4 || lh == 10) {
+			if((lh == 4 || lh == 10) && lh != len) {
 				sb.append(" ");
 			}
 		}
-		mLastEvent = TextEvent.FORMATTER;
-		setText(sb.toString());
+        return sb.toString();
 	}
 
 	@Override
