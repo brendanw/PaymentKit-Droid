@@ -53,10 +53,6 @@ public class CardNumEditText extends EditText {
 		setFilters(filters);
 	}
 
-	/* Card Number Input Field Text Watcher */
-	private boolean mTextAdded = true;
-	private int mPrevLength = 0;
-
 	enum TextEvent {
 		KEY_PRESS, FORMATTER
 	};
@@ -69,6 +65,10 @@ public class CardNumEditText extends EditText {
 	}
 
 	TextWatcher mCardNumberTextWatcher = new TextWatcher() {
+        /* Card Number Input Field Text Watcher */
+        private boolean mTextAdded = true;
+        private int mPrevLength = 0;
+
 		@Override
 		public void afterTextChanged(Editable s) {
 			setTextColor(Color.DKGRAY);
@@ -80,10 +80,10 @@ public class CardNumEditText extends EditText {
 				int previousCursorPosition = getSelectionEnd();
                 // Remove our selves while we edit this text.
                 removeTextChangedListener(this);
-                formatText(s);
+                boolean removedTwoFromEnd = formatText(s);
                 addTextChangedListener(this);
 
-                positionCursor(s, previousCursorPosition);
+                positionCursor(s, previousCursorPosition, removedTwoFromEnd);
 			}
 			if (mLastEvent != TextEvent.KEY_PRESS) {
                 		mLastEvent = TextEvent.KEY_PRESS;
@@ -91,9 +91,14 @@ public class CardNumEditText extends EditText {
 		}
 
         /** This fixes the awkwardness when the user adds or deletes around a space. **/
-		private void positionCursor(Editable s, int oldPos) {
-            String str = s.toString();
+		private void positionCursor(Editable s, int oldPos, boolean removedTwoFromEnd) {
             int newPos = getSelectionEnd();
+            if (removedTwoFromEnd) {
+                setSelection(newPos + 1);
+                return;
+            }
+
+            String str = s.toString();
             String selected =  newPos > 0 ? str.substring(newPos - 1, newPos) : "";
             if (oldPos == newPos && " ".equals(selected)) {
                 if (mTextAdded) {
@@ -119,9 +124,10 @@ public class CardNumEditText extends EditText {
 		}
 	};
 
-    private void formatText(Editable editable) {
+    private boolean formatText(Editable editable) {
         String newString = null;
-        String strippedString = ValidateCreditCard.removeNonNumbers(editable.toString());
+        String oldStr = editable.toString();
+        String strippedString = ValidateCreditCard.removeNonNumbers(oldStr);
         if(mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH) {
             newString = format16Text(strippedString);
         } else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH) {
@@ -130,12 +136,19 @@ public class CardNumEditText extends EditText {
 
         mLastEvent = TextEvent.FORMATTER;
         if (newString != null) {
-            InputFilter[] filters = editable.getFilters();
-            editable.setFilters(new InputFilter[] { });
-            // We need to remove filters so we can add text with spaces.
-            editable.replace(0, editable.length(), newString);
-            editable.setFilters(filters);
+            replaceAllText(editable, newString);
         }
+        return newString.length() + 1 == oldStr.length()
+                && oldStr.length() > 2
+                && oldStr.substring(oldStr.length() - 2, oldStr.length() -1).equals(" ");
+    }
+
+    private void replaceAllText(Editable editable, String newString) {
+        InputFilter[] filters = editable.getFilters();
+        editable.setFilters(new InputFilter[] { });
+        // We need to remove filters so we can add text with spaces.
+        editable.replace(0, editable.length(), newString);
+        editable.setFilters(filters);
     }
 
     /*
