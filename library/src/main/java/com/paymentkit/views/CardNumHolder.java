@@ -146,4 +146,9 @@ public class CardNumHolder extends FrameLayout {
 		return mLeftOffset;
 	}
 
+    public void resetTextColor() {
+        if (mCardNumberEditText.getCurrentTextColor() != Color.DKGRAY) {
+            mCardNumberEditText.setTextColor(Color.DKGRAY);
+        }
+    }
 }

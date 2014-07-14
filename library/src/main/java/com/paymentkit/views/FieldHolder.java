@@ -177,15 +177,18 @@ public class FieldHolder extends RelativeLayout {
 
 		@Override
 		public void onEdit() {
-			CardType newCardType = ValidateCreditCard.getCardType(mCardHolder.getCardField().getText().toString());
-			if (newCardType == CardType.AMERICAN_EXPRESS) {
-				mCardHolder.getCardField().setMaxCardLength(AMEX_CARD_LENGTH);
-				setCVVMaxLength(4);
-			} else {
-				mCardHolder.getCardField().setMaxCardLength(NON_AMEX_CARD_LENGTH);
-				setCVVMaxLength(3);
-			}
-			mCardIcon.setCardType(newCardType);
+            mCardHolder.resetTextColor(); // In case the text color is an an error state.
+            CardType newCardType = ValidateCreditCard.getCardType(mCardHolder.getCardField().getText().toString());
+            if (!mCardIcon.isCardType(newCardType)) {
+                if (newCardType == CardType.AMERICAN_EXPRESS) {
+                    mCardHolder.getCardField().setMaxCardLength(AMEX_CARD_LENGTH);
+                    setCVVMaxLength(4);
+                } else {
+                    mCardHolder.getCardField().setMaxCardLength(NON_AMEX_CARD_LENGTH);
+                    setCVVMaxLength(3);
+                }
+                mCardIcon.setCardType(newCardType);
+            }
 		}
 
 		@Override
