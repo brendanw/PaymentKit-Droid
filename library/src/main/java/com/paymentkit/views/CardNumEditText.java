@@ -73,14 +73,14 @@ public class CardNumEditText extends EditText {
 
             // Notify listener
             mCardEntryListener.onEdit();
-            if (isInputComplete()) {
+            if (isCardNumberInputComplete()) {
                 mCardEntryListener.onCardNumberInputComplete();
             }
 
             addTextChangedListener(this);
 		}
 
-        private boolean isInputComplete() {
+        private boolean isCardNumberInputComplete() {
             return length() == mMaxCardLength && mTextAdded;
         }
 
