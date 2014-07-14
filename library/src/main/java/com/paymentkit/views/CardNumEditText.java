@@ -201,21 +201,46 @@ public class CardNumEditText extends EditText {
 
 		@Override
 		public boolean sendKeyEvent(KeyEvent event) {
-			if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-				int curPos = getSelectionEnd();
-
-				if (mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH && (curPos == 5 || curPos == 10 || curPos == 15)) {
-					CardNumEditText.this.setSelection(curPos - 1);
-					return true;
-				} else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH && (curPos == 5 || curPos == 12)) {
-					CardNumEditText.this.setSelection(curPos - 1);
-					return true;
-				}
+            boolean shouldConsume = false;
+			if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                switch (event.getKeyCode()) {
+                    case KeyEvent.KEYCODE_DEL: shouldConsume = handleDelete(); break;
+                    // On a hardware keyboard IME_ACTION_NEXT may come as an enter key.
+                    case KeyEvent.KEYCODE_ENTER: shouldConsume = handleNextPress(); break;
+                }
 			}
-			return super.sendKeyEvent(event);
+			return shouldConsume ? true : super.sendKeyEvent(event);
 		}
 
-		@Override
+        @Override
+        public boolean performEditorAction(int editorAction) {
+            boolean shouldConsume = false;
+            switch (editorAction) {
+                case EditorInfo.IME_ACTION_NEXT: shouldConsume = handleNextPress(); break;
+            }
+            return shouldConsume ? true : super.performEditorAction(editorAction);
+        }
+
+        private boolean handleNextPress() {
+            // User has requested that we validate their card number.
+            mCardEntryListener.onCardNumberInputComplete();
+            return true;
+        }
+
+        private boolean handleDelete() {
+            int curPos = getSelectionEnd();
+
+            if (mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH && (curPos == 5 || curPos == 10 || curPos == 15)) {
+                CardNumEditText.this.setSelection(curPos - 1);
+                return true;
+            } else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH && (curPos == 5 || curPos == 12)) {
+                CardNumEditText.this.setSelection(curPos - 1);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
 		public boolean deleteSurroundingText(int beforeLength, int afterLength) {
 			// magic: in latest Android, deleteSurroundingText(1, 0) will be
 			// called for backspace
