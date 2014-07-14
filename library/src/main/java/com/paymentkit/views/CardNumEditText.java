@@ -127,7 +127,7 @@ public class CardNumEditText extends EditText {
     private boolean formatText(Editable editable) {
         String newString = null;
         String oldStr = editable.toString();
-        String strippedString = ValidateCreditCard.removeNonNumbers(oldStr);
+        String strippedString = ValidateCreditCard.numericOnlyString(oldStr);
         if(mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH) {
             newString = format16Text(strippedString);
         } else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH) {
