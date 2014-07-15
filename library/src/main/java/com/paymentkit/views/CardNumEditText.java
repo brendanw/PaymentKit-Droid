@@ -12,6 +12,7 @@ import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
 import com.paymentkit.ValidateCreditCard;
+import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
 public class CardNumEditText extends EditText {
@@ -135,7 +136,7 @@ public class CardNumEditText extends EditText {
         }
 
         if (newString != null) {
-            replaceAllText(editable, newString);
+            ViewUtils.replaceAllText(editable, newString);
         }
         return haveLastMemberOfGroupBeenRemoved(newString, oldString);
     }
@@ -144,14 +145,6 @@ public class CardNumEditText extends EditText {
         return newString.length() + 1 == oldString.length()
                 && oldString.length() > 2
                 && oldString.substring(oldString.length() - 2, oldString.length() -1).equals(" ");
-    }
-
-    private void replaceAllText(Editable editable, String newString) {
-        InputFilter[] filters = editable.getFilters();
-        editable.setFilters(new InputFilter[] { });
-        // We need to remove filters so we can add text with spaces.
-        editable.replace(0, editable.length(), newString);
-        editable.setFilters(filters);
     }
 
     /*

@@ -1,15 +1,17 @@
 package com.paymentkit.util;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import android.app.Activity;
 import android.content.Context;
+import android.text.Editable;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.inputmethod.InputMethodManager;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class ViewUtils {
 
@@ -25,6 +27,14 @@ public class ViewUtils {
 			imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
 		}
 	}
+
+    public static void replaceAllText(Editable editable, CharSequence newString) {
+        InputFilter[] filters = editable.getFilters();
+        editable.setFilters(new InputFilter[] { });
+        // We need to remove filters so we can add text with spaces.
+        editable.replace(0, editable.length(), newString);
+        editable.setFilters(filters);
+    }
 
 	public static int getScreenHeight(final Context context) {
 		return context.getResources().getDisplayMetrics().heightPixels;
