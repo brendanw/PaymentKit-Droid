@@ -60,13 +60,13 @@ public class CardNumHolder extends RelativeLayout {
 
 	public boolean isCardNumValid() {
 		if (mCardNumberEditText.length() < mCardNumberEditText.getMaxCardLength()) {
-			ToastUtils.showToast(getContext(), getResources().getString(R.string.pK_error_invalid_card_no));
+			ToastUtils.showToast(getContext(), getResources().getString(R.string.pk_error_invalid_card_no));
 			return false;
 		} else if (mCardNumberEditText.length() == mCardNumberEditText.getMaxCardLength()) {
 			if (ValidateCreditCard.isValid(Long.parseLong(getCardField().getText().toString().replaceAll("\\s", "")))) {
 				return true;
 			} else {
-				ToastUtils.showToast(getContext(), getResources().getString(R.string.pK_error_invalid_card_no));
+				ToastUtils.showToast(getContext(), getResources().getString(R.string.pk_error_invalid_card_no));
 			}
 		}
 		return false;

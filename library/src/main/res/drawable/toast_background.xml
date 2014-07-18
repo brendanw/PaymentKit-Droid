@@ -5,8 +5,8 @@
 
     <stroke
         android:width="2dp"
-        android:color="@color/pK_stubhub_blue" />
+        android:color="@color/pk_stubhub_blue" />
 
-    <solid android:color="@color/pK_half_transparent" />
+    <solid android:color="@color/pk_half_transparent" />
 
 </shape>
