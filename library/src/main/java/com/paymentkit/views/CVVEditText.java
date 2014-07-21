@@ -21,8 +21,9 @@ import com.paymentkit.views.FieldHolder.CardEntryListener;
 
 public class CVVEditText extends EditText {
 
-    public static final int CVV_MAX_LENGTH = 3;
-    private int cvvMaxLength = CVV_MAX_LENGTH;
+    public static final int CCV_LENGTH = 3;
+    public static final int CCV_AMEX_LENGTH = 4;
+    private int cvvMaxLength = CCV_LENGTH;
 	
 	private static final String TAG = CVVEditText.class.getSimpleName();
 	

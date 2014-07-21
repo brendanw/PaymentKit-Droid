@@ -25,9 +25,9 @@ import com.paymentkit.views.CardIcon.CardFace;
  */
 public class FieldHolder extends RelativeLayout {
 
-	protected static final int AMEX_CARD_LENGTH = 17;
+	public static final int AMEX_CARD_LENGTH = 17;
 	public static final int NON_AMEX_CARD_LENGTH = 19;
-	
+
 	private static final int RE_ENTRY_ALPHA_OUT_DURATION = 100;
 	private static final int RE_ENTRY_ALPHA_IN_DURATION = 500;
 	private static final int RE_ENTRY_OVERSHOOT_DURATION = 500;
@@ -240,10 +240,10 @@ public class FieldHolder extends RelativeLayout {
             if (!mCardIcon.isCardType(newCardType)) {
                 if (newCardType == CardType.AMERICAN_EXPRESS) {
                     mCardHolder.getCardField().setMaxCardLength(AMEX_CARD_LENGTH);
-                    mCVVEditText.setCVVMaxLength(4);
+                    mCVVEditText.setCVVMaxLength(CVVEditText.CCV_AMEX_LENGTH);
                 } else {
                     mCardHolder.getCardField().setMaxCardLength(NON_AMEX_CARD_LENGTH);
-                    mCVVEditText.setCVVMaxLength(3);
+                    mCVVEditText.setCVVMaxLength(CVVEditText.CCV_LENGTH);
                 }
                 mCardIcon.setCardType(newCardType);
             }
