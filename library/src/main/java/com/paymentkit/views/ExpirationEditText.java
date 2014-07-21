@@ -1,16 +1,21 @@
 package com.paymentkit.views;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.animation.CycleInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
+import com.nineoldandroids.animation.Animator;
+import com.nineoldandroids.animation.AnimatorListenerAdapter;
+import com.nineoldandroids.animation.ObjectAnimator;
 import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
@@ -182,14 +187,33 @@ public class ExpirationEditText extends EditText {
 		return yearStr;
 	}
 
+    public boolean isValid() {
+        return getText().toString().length() == 5;
+    }
+
+    public void indicateInvalidDate() {
+        final int textColor = getCurrentTextColor();
+        setTextColor(Color.RED);
+        ObjectAnimator shakeAnim = ObjectAnimator.ofFloat(this, "translationX", -16);
+        shakeAnim.setDuration(FieldHolder.SHAKE_DURATION);
+        shakeAnim.setInterpolator(new CycleInterpolator(2.0f));
+        shakeAnim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator anim) {
+                setTextColor(textColor);
+            }
+        });
+        shakeAnim.start();
+    }
+
 	@Override
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
 		return new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
 	}
 
-	/*
-	 * See "android EditText delete(backspace) key event" on stackoverflow
-	 */
+    /*
+     * See "android EditText delete(backspace) key event" on stackoverflow
+     */
 	private class ZanyInputConnection extends InputConnectionWrapper {
 
 		public ZanyInputConnection(InputConnection target, boolean mutable) {

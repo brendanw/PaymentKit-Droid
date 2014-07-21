@@ -22,8 +22,6 @@ public class CardNumHolder extends FrameLayout {
 
 	private static final String TAG = CardNumHolder.class.getSimpleName();
 
-	private static final int SHAKE_DURATION = 400;
-
 	private CardNumEditText mCardNumberEditText;
 	private InterceptEditText mLastFourDigits;
 	private float mLeftOffset;
@@ -108,7 +106,7 @@ public class CardNumHolder extends FrameLayout {
 		getCardField().setTextColor(Color.RED);
 		mTopItem = mCardNumberEditText;
 		ObjectAnimator shakeAnim = ObjectAnimator.ofFloat(getCardField(), "translationX", -16);
-		shakeAnim.setDuration(SHAKE_DURATION);
+		shakeAnim.setDuration(FieldHolder.SHAKE_DURATION);
 		shakeAnim.setInterpolator(new CycleInterpolator(2.0f));
 		shakeAnim.addListener(new AnimatorListenerAdapter() {
 			@Override

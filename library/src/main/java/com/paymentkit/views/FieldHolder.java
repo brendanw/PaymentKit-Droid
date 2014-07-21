@@ -1,7 +1,6 @@
 package com.paymentkit.views;
 
 import android.content.Context;
-import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,12 +24,10 @@ import com.paymentkit.views.CardIcon.CardFace;
  *
  */
 public class FieldHolder extends RelativeLayout {
-	
-	public static int CVV_MAX_LENGTH = 3;
-	
-	protected static final int AMEX_CARD_LENGTH = 17;
+
+	public static final int AMEX_CARD_LENGTH = 17;
 	public static final int NON_AMEX_CARD_LENGTH = 19;
-	
+
 	private static final int RE_ENTRY_ALPHA_OUT_DURATION = 100;
 	private static final int RE_ENTRY_ALPHA_IN_DURATION = 500;
 	private static final int RE_ENTRY_OVERSHOOT_DURATION = 500;
@@ -40,8 +37,12 @@ public class FieldHolder extends RelativeLayout {
 	private CVVEditText mCVVEditText;
 	private CardIcon mCardIcon;
 	private LinearLayout mExtraFields;
-	
-	public FieldHolder(Context context) {
+
+    private OnCardValidListener mCardValidListener;
+
+    protected static final int SHAKE_DURATION = 400;
+
+    public FieldHolder(Context context) {
 		super(context);
 		setup();
 	}
@@ -50,22 +51,63 @@ public class FieldHolder extends RelativeLayout {
 		super(context, attrs);
 		setup();
 	}
-	
+
 	public CVVEditText getCVVEditText() {
 		return mCVVEditText;
 	}
-	
+
 	public CardIcon getCardIcon() {
 		return mCardIcon;
 	}
-	
+
 	public ExpirationEditText getExpirationEditText() {
 		return mExpirationEditText;
 	}
-	
+
 	public CardNumHolder getCardNumHolder() {
 		return mCardHolder;
 	}
+
+    public String getCVV() {
+        return mCVVEditText.getText().toString();
+    }
+
+    public String getExprMonth() {
+        return mExpirationEditText.getMonth();
+    }
+
+    public String getExprYear() {
+        return mExpirationEditText.getYear();
+    }
+
+    public String getExprYearAbv() {
+        return mExpirationEditText.getYearAbv();
+    }
+
+    public String getCardNumber() {
+        return mCardHolder.getCardNumberEditText();
+    }
+
+    public boolean isFieldsValid() {
+        if (!mCardHolder.isCardNumValid()) {
+            return false;
+        } else if (mExpirationEditText.isValid()) {
+            return false;
+        } else if (mCVVEditText.isValid()) {
+            return false;
+        }
+        return true;
+    }
+
+    /** this listener is a great place to call:
+     * ViewUtils.hideSoftKeyboard((Activity)getContext());
+     * clearFocus();
+     *
+     * Or to send focus to your next view.
+     */
+    public void setOnCardValidListener(OnCardValidListener listener) {
+        mCardValidListener = listener;
+    }
 	
 	public void lockCardNumField() {
 		transitionToExtraFields();
@@ -146,27 +188,43 @@ public class FieldHolder extends RelativeLayout {
 
 		mExpirationEditText.requestFocus();
 	}
+
+    /** @return true if it focuses on an invalid field. **/
+    private boolean focusOnInvalidField() {
+        if (!mCardHolder.isCardNumValid()) {
+            transitionToExtraFields();
+            return true;
+        }
+        if (!mExpirationEditText.isValid()) {
+            mExpirationEditText.requestFocus();
+            mExpirationEditText.indicateInvalidDate();
+            return true;
+        }
+        if (!mCVVEditText.isValid()) {
+            mCVVEditText.requestFocus();
+            mCVVEditText.indicateInvalidCVV();
+            return true;
+        }
+        return false;
+    }
+
+    public interface OnCardValidListener {
+        public void cardIsValid();
+    }
 	
-	public interface CardEntryListener {
-		public void onCardNumberInputComplete();
+	protected interface CardEntryListener {
+		void onCardNumberInputComplete();
 
-		public void onEdit();
+		void onEdit();
 
-		public void onCardNumberInputReEntry();
+		void onCardNumberInputReEntry();
 
-		public void onCVVEntry();
+		void onCVVEntry();
 
-		public void onCVVEntryComplete();
+		void onCVVEntryComplete();
 
-		public void onBackFromCVV();
+		void onBackFromCVV();
 
-	}
-	
-	private void setCVVMaxLength(int val) {
-		CVV_MAX_LENGTH = val;
-		InputFilter[] filters = new InputFilter[1];
-		filters[0] = new InputFilter.LengthFilter(val);
-		mCVVEditText.setFilters(filters);
 	}
 
 	CardEntryListener mCardEntryListener = new CardEntryListener() {
@@ -182,10 +240,10 @@ public class FieldHolder extends RelativeLayout {
             if (!mCardIcon.isCardType(newCardType)) {
                 if (newCardType == CardType.AMERICAN_EXPRESS) {
                     mCardHolder.getCardField().setMaxCardLength(AMEX_CARD_LENGTH);
-                    setCVVMaxLength(4);
+                    mCVVEditText.setCVVMaxLength(CVVEditText.CCV_AMEX_LENGTH);
                 } else {
                     mCardHolder.getCardField().setMaxCardLength(NON_AMEX_CARD_LENGTH);
-                    setCVVMaxLength(3);
+                    mCVVEditText.setCVVMaxLength(CVVEditText.CCV_LENGTH);
                 }
                 mCardIcon.setCardType(newCardType);
             }
@@ -228,9 +286,11 @@ public class FieldHolder extends RelativeLayout {
 
 		@Override
 		public void onCVVEntryComplete() {
-			mCardIcon.flipTo(CardFace.FRONT);
-			FieldHolder.this.requestFocus();
-			// complete
+            if (!focusOnInvalidField()) {
+                mCardIcon.flipTo(CardFace.FRONT);
+                if (mCardValidListener != null) mCardValidListener.cardIsValid();
+                // complete
+            }
 		}
 
 		@Override
@@ -240,14 +300,4 @@ public class FieldHolder extends RelativeLayout {
 		}
 
 	};
-	
-	public boolean isFieldsValid() {
-		if (mExpirationEditText.getText().toString().length() != 5) {
-			return false;
-		} else if (mCVVEditText.getText().toString().length() != CVV_MAX_LENGTH) {
-			return false;
-		}
-		return true;
-	}
-
 }
