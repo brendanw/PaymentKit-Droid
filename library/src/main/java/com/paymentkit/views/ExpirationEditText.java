@@ -1,21 +1,18 @@
 package com.paymentkit.views;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
-import android.view.animation.CycleInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
-import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.animation.ObjectAnimator;
+import com.paymentkit.util.AnimUtils;
 import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
@@ -32,8 +29,9 @@ public class ExpirationEditText extends EditText {
 	private static final String TAG = ExpirationEditText.class.getSimpleName();
 
 	private CardEntryListener mListener;
+    private ObjectAnimator shakeAnim;
 
-	public ExpirationEditText(Context context) {
+    public ExpirationEditText(Context context) {
 		super(context);
 		setup();
 	}
@@ -116,13 +114,13 @@ public class ExpirationEditText extends EditText {
             int tensPlace = Integer.parseInt(getText().subSequence(0, 1).toString());
             if (mTextAdded && monthStr.length() == 1) {
                 if (tensPlace > 1) {
-                    return "";
+                    return truncateAndIndicateInvalid("");
                 }
             } else if (mTextAdded && length() == 2) {
                 // one places of month validation
                 int onesPlace = Integer.parseInt(getText().subSequence(1, 2).toString());
                 if ((tensPlace == 1 && onesPlace > 2) || (tensPlace == 0 && onesPlace == 0)) {
-                    return getText().subSequence(0, 1);
+                    return truncateAndIndicateInvalid(monthStr);
                 }
             }
             return monthStr;
@@ -136,7 +134,7 @@ public class ExpirationEditText extends EditText {
                 int inputTensPlace = Integer.parseInt(yearStr.substring(0, 1));
 
                 if (inputTensPlace < curTensPlace) {
-                    return "";
+                    return truncateAndIndicateInvalid("");
                 }
 
             } else if (mTextAdded && yearStr.length() == 2) {
@@ -148,17 +146,25 @@ public class ExpirationEditText extends EditText {
                 if (!TextUtils.isEmpty(getMonth())) {
                     int inputMonth = Integer.parseInt(getMonth());
                     if (inputYear < curYear || ((inputMonth < curMonth) && inputYear == curYear)) {
-                        return yearStr.subSequence(0, 1);
+                        return truncateAndIndicateInvalid(yearStr);
                     }
                 } else {
                     if (inputYear < curYear) {
-                        return yearStr.subSequence(0, 1);
+                        return truncateAndIndicateInvalid(yearStr);
                     }
                 }
             }
             return yearStr;
         }
 	};
+
+    private CharSequence truncateAndIndicateInvalid(String string) {
+        indicateInvalidDate();
+        if (string != null && string.length() > 0) {
+            return string.subSequence(0, 1);
+        }
+        return "";
+    }
 
     public String getMonth() {
 		String text = getText().toString();
@@ -192,17 +198,8 @@ public class ExpirationEditText extends EditText {
     }
 
     public void indicateInvalidDate() {
-        final int textColor = getCurrentTextColor();
-        setTextColor(Color.RED);
-        ObjectAnimator shakeAnim = ObjectAnimator.ofFloat(this, "translationX", -16);
-        shakeAnim.setDuration(FieldHolder.SHAKE_DURATION);
-        shakeAnim.setInterpolator(new CycleInterpolator(2.0f));
-        shakeAnim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator anim) {
-                setTextColor(textColor);
-            }
-        });
+        if (shakeAnim != null) shakeAnim.end();
+        shakeAnim = AnimUtils.getShakeAnimation(this, true);
         shakeAnim.start();
     }
 

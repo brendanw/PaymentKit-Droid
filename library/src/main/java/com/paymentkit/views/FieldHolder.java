@@ -40,8 +40,6 @@ public class FieldHolder extends RelativeLayout {
 
     private OnCardValidListener mCardValidListener;
 
-    protected static final int SHAKE_DURATION = 400;
-
     public FieldHolder(Context context) {
 		super(context);
 		setup();
