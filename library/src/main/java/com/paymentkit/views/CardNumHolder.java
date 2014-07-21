@@ -6,7 +6,6 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.CycleInterpolator;
 import android.widget.FrameLayout;
 
 import com.nineoldandroids.animation.Animator;
@@ -14,6 +13,7 @@ import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.paymentkit.R;
 import com.paymentkit.ValidateCreditCard;
+import com.paymentkit.util.AnimUtils;
 import com.paymentkit.util.ToastUtils;
 import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
@@ -103,11 +103,8 @@ public class CardNumHolder extends FrameLayout {
 	}
 
 	public void indicateInvalidCardNum() {
-		getCardField().setTextColor(Color.RED);
 		mTopItem = mCardNumberEditText;
-		ObjectAnimator shakeAnim = ObjectAnimator.ofFloat(getCardField(), "translationX", -16);
-		shakeAnim.setDuration(FieldHolder.SHAKE_DURATION);
-		shakeAnim.setInterpolator(new CycleInterpolator(2.0f));
+		ObjectAnimator shakeAnim = AnimUtils.getShakeAnimation(getCardField(), false);
 		shakeAnim.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(Animator anim) {
