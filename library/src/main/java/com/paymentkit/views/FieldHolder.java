@@ -83,7 +83,11 @@ public class FieldHolder extends RelativeLayout {
     }
 
     public String getCardNumber() {
-        return mCardHolder.getCardNumberEditText();
+        return mCardHolder.getCardField().getText().toString();
+    }
+
+    public String getCardType() {
+        return mCardIcon.getCardType().getName();
     }
 
     public boolean isFieldsValid() {
