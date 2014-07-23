@@ -93,9 +93,9 @@ public class FieldHolder extends RelativeLayout {
     public boolean isFieldsValid() {
         if (!mCardHolder.isCardNumValid()) {
             return false;
-        } else if (mExpirationEditText.isValid()) {
+        } else if (!mExpirationEditText.isValid()) {
             return false;
-        } else if (mCVVEditText.isValid()) {
+        } else if (!mCVVEditText.isValid()) {
             return false;
         }
         return true;
