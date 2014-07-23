@@ -1,0 +1,5 @@
+<resources>
+
+	<dimen name="pk_checkout_input_field_text_size">18sp</dimen>
+	
+</resources>

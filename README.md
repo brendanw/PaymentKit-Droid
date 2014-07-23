@@ -6,8 +6,8 @@ popular by StubHub, Stripe, Uber, and Postmates. The library provides support fo
 
 The PKExample provides an example implementation pattern you may follow.
 
-The 'PaymentKit Droid' folder is the library project you want to add to
-your Android project. See http://stackoverflow.com/questions/8248196/how-to-add-a-library-project-to-a-android-project.
+Right now you'll need to add this project as a submodule project to Android Studio. 
+For more information see http://www.ipreferjim.com/2013/06/android-studio-and-library-projects/
 
 A sample app will soon be available on the google play store.
 
@@ -15,10 +15,11 @@ Feel free to leave requests and feedback through github (brendanw) or twitter (e
 
 You can also find my contact information at http://www.brendanweinstein.me
 
-Things to be added in the future:<br>
--Documentation<br>
--Better handling of spacing for landscape mode<br>
--Support for more cards<br>
--Removal of edittext assets and the addition of code for using default android edittext backgrounds<br />
--Ability to move cursor anywhere in expiration date field.<br />
--More error messaging ability options<br />
+Things to be added in the future:
+
+- Documentation
+- AAR getting added to maven central
+- Better handling of spacing for landscape mode
+- Support for more cards
+- Ability to move cursor anywhere in expiration date field.
+- More error messaging ability options 
