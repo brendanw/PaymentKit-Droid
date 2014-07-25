@@ -14,7 +14,6 @@ import com.nineoldandroids.animation.ObjectAnimator;
 import com.paymentkit.R;
 import com.paymentkit.ValidateCreditCard;
 import com.paymentkit.util.AnimUtils;
-import com.paymentkit.util.ToastUtils;
 import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
@@ -59,13 +58,10 @@ public class CardNumHolder extends FrameLayout {
 
 	public boolean isCardNumValid() {
 		if (mCardNumberEditText.length() < mCardNumberEditText.getMaxCardLength()) {
-			ToastUtils.showToast(getContext(), getResources().getString(R.string.pk_error_invalid_card_no));
 			return false;
 		} else if (mCardNumberEditText.length() == mCardNumberEditText.getMaxCardLength()) {
 			if (ValidateCreditCard.isValid(Long.parseLong(getCardField().getText().toString().replaceAll("\\s", "")))) {
 				return true;
-			} else {
-				ToastUtils.showToast(getContext(), getResources().getString(R.string.pk_error_invalid_card_no));
 			}
 		}
 		return false;

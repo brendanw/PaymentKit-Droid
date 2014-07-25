@@ -45,7 +45,9 @@ public class PKFragment extends Fragment {
 			ViewUtils.hideSoftKeyboard(getActivity());
 			if (mFieldHolder.isFieldsValid()) {
 				ToastUtils.showToast(getActivity(), "Valid credit card entry!");
-			}
+			} else {
+                ToastUtils.showToast(getActivity(), getResources().getString(com.paymentkit.R.string.pk_error_invalid_card_no));
+            }
 		}
 	};
 
