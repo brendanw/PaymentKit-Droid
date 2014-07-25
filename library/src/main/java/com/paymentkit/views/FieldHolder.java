@@ -82,8 +82,10 @@ public class FieldHolder extends RelativeLayout {
         return mExpirationEditText.getYearAbv();
     }
 
+    /** Returns a string with only numeric characters. **/
     public String getCardNumber() {
-        return mCardHolder.getCardField().getText().toString();
+        String formattedNumber = mCardHolder.getCardField().getText().toString();
+        return ValidateCreditCard.numericOnlyString(formattedNumber);
     }
 
     public String getCardType() {
