@@ -67,7 +67,11 @@ public class CardIcon extends FrameLayout {
 		}
 	}
 
-	public enum CardFace {
+    public boolean isCardType(CardType newCardType) {
+        return newCardType == mCardType;
+    }
+
+    public enum CardFace {
 		BACK, FRONT
 	};
 

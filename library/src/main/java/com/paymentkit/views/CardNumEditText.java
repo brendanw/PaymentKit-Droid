@@ -1,8 +1,6 @@
 package com.paymentkit.views;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -13,6 +11,8 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
+import com.paymentkit.ValidateCreditCard;
+import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
 public class CardNumEditText extends EditText {
@@ -52,62 +52,61 @@ public class CardNumEditText extends EditText {
 		setFilters(filters);
 	}
 
-	/* Card Number Input Field Text Watcher */
-	private boolean mTextAdded = true;
-	private int mPrevLength = 0;
-
-	enum TextEvent {
-		KEY_PRESS, FORMATTER
-	};
-
-	private TextEvent mLastEvent = TextEvent.KEY_PRESS;
-
-	@Override
-	public void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-	}
+    public String getLast4Digits() {
+        String text = getText().toString().replaceAll("\\s", "");
+        return text.substring(text.length() - 4, text.length());
+    }
 
 	TextWatcher mCardNumberTextWatcher = new TextWatcher() {
+        /* Card Number Input Field Text Watcher */
+        private boolean mTextAdded = true;
+        private int mPrevLength = 0;
+
 		@Override
 		public void afterTextChanged(Editable s) {
-			setTextColor(Color.DKGRAY);
-			mCardEntryListener.onEdit();
-			if (length() == mMaxCardLength && mTextAdded) {
-				mCardEntryListener.onCardNumberInputComplete();
-			}
-			if (mLastEvent == TextEvent.KEY_PRESS) {
-				int curPos = getSelectionEnd();
-				formatText(getText().toString().replaceAll(" ", ""));
-				positionCursor(curPos);
-			}
-			if (mLastEvent != TextEvent.KEY_PRESS) {
-                		mLastEvent = TextEvent.KEY_PRESS;
-        		}
-		}
-		
-		private void formatText(String strippedStr) {
-			if(mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH) {
-				format16Text(strippedStr);
-			} else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH) {
-				format15Text(strippedStr);
-			}
+            // Remove our selves while we edit this text.
+            removeTextChangedListener(this);
+
+            int oldSelectionPosition = getSelectionEnd();
+            boolean removedTwoFromEnd = formatText(s);
+            fixSelectionPosition(s, oldSelectionPosition, removedTwoFromEnd);
+
+
+            // Notify listener
+            mCardEntryListener.onEdit();
+            if (isCardNumberInputComplete()) {
+                mCardEntryListener.onCardNumberInputComplete();
+            }
+
+            addTextChangedListener(this);
 		}
 
-		private void positionCursor(int curPos) {
-			if (mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH) {
-				if (mTextAdded && (curPos == 4 || curPos == 9 || curPos == 14)) {
-					setSelection(curPos + 1);
-				} else {
-					setSelection(curPos);
-				}
-			} else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH) {
-				if (mTextAdded && (curPos == 4 || curPos == 11)) {
-					setSelection(curPos + 1);
-				} else {
-					setSelection(curPos);
-				}
-			}
+        private boolean isCardNumberInputComplete() {
+            return length() == mMaxCardLength && mTextAdded;
+        }
+
+        /** This fixes the awkwardness when the user adds or deletes around a space. **/
+		private void fixSelectionPosition(Editable s, int oldPos, boolean removedTwoFromEnd) {
+            int newPos = getSelectionEnd();
+            if (removedTwoFromEnd) {
+                setSelection(newPos + 1);
+                return;
+            }
+
+            if (cursorIsOnASpace(oldPos, newPos, s)) {
+                if (mTextAdded) {
+                    setSelection(newPos + 1);
+                } else {
+                    setSelection(newPos - 1);
+                }
+            }
 		}
+
+        private boolean cursorIsOnASpace(int oldPos, int newPos, Editable s) {
+            String str = s.toString();
+            String selected =  newPos > 0 ? str.substring(newPos - 1, newPos) : "";
+            return oldPos == newPos && " ".equals(selected);
+        }
 
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -116,45 +115,71 @@ public class CardNumEditText extends EditText {
 
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
-			if (length() - mPrevLength > 0) {
-				mTextAdded = true;
-			} else {
-				mTextAdded = false;
-			}
+		    mTextAdded = length() - mPrevLength > 0;
 		}
 	};
 
-	/*
-	 * 4-4-4-4
-	 */
-	private void format16Text(String strippedStr) {
+    /////////////////////
+    // Formatting Methods
+    /////////////////////
+
+    /** @return true if the char in the last group was moved to an earlier group. **/
+    private boolean formatText(Editable editable) {
+        String oldString = editable.toString();
+
+        String newString = null;
+        String strippedString = ValidateCreditCard.numericOnlyString(oldString);
+        if(mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH) {
+            newString = format16Text(strippedString);
+        } else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH) {
+            newString = format15Text(strippedString);
+        }
+
+        if (newString != null) {
+            ViewUtils.replaceAllText(editable, newString);
+        }
+        return haveLastMemberOfGroupBeenRemoved(newString, oldString);
+    }
+
+    private boolean haveLastMemberOfGroupBeenRemoved(String newString, String oldString) {
+        return newString.length() + 1 == oldString.length()
+                && oldString.length() > 2
+                && oldString.substring(oldString.length() - 2, oldString.length() -1).equals(" ");
+    }
+
+    /*
+     * 4-4-4-4
+     */
+    private String format16Text(String strippedStr) {
 		int len = strippedStr.length();
 		StringBuilder sb = new StringBuilder();
 		for (int lh = 1; lh <= len; lh++) {
 			sb.append(strippedStr.charAt(lh - 1));
-			if (lh % 4 == 0 && lh < 16) {
+			if (lh % 4 == 0 && lh < 16 && lh != len) {
 				sb.append(" ");
 			}
 		}
-		mLastEvent = TextEvent.FORMATTER;
-		setText(sb.toString());
+		return sb.toString();
 	}
 
 	/*
 	 * 4-6-5
 	 */
-	private void format15Text(String strippedStr) {
+	private String format15Text(String strippedStr) {
 		int len = strippedStr.length();
 		StringBuilder sb = new StringBuilder();
 		for(int lh=1; lh <= len; lh++) {
 			sb.append(strippedStr.charAt(lh-1));
-			if(lh == 4 || lh == 10) {
+			if((lh == 4 || lh == 10) && lh != len) {
 				sb.append(" ");
 			}
 		}
-		mLastEvent = TextEvent.FORMATTER;
-		setText(sb.toString());
+        return sb.toString();
 	}
+
+    /////////////////
+    // Input Methods
+    /////////////////
 
 	@Override
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
@@ -169,21 +194,46 @@ public class CardNumEditText extends EditText {
 
 		@Override
 		public boolean sendKeyEvent(KeyEvent event) {
-			if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-				int curPos = getSelectionEnd();
-				mLastEvent = TextEvent.KEY_PRESS;
-				if (mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH && (curPos == 5 || curPos == 10 || curPos == 15)) {
-					CardNumEditText.this.setSelection(curPos - 1);
-					return true;
-				} else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH && (curPos == 5 || curPos == 12)) {
-					CardNumEditText.this.setSelection(curPos - 1);
-					return true;
-				}
+            boolean shouldConsume = false;
+			if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                switch (event.getKeyCode()) {
+                    case KeyEvent.KEYCODE_DEL: shouldConsume = handleDelete(); break;
+                    // On a hardware keyboard IME_ACTION_NEXT may come as an enter key.
+                    case KeyEvent.KEYCODE_ENTER: shouldConsume = handleNextPress(); break;
+                }
 			}
-			return super.sendKeyEvent(event);
+			return shouldConsume ? true : super.sendKeyEvent(event);
 		}
 
-		@Override
+        @Override
+        public boolean performEditorAction(int editorAction) {
+            boolean shouldConsume = false;
+            switch (editorAction) {
+                case EditorInfo.IME_ACTION_NEXT: shouldConsume = handleNextPress(); break;
+            }
+            return shouldConsume ? true : super.performEditorAction(editorAction);
+        }
+
+        private boolean handleNextPress() {
+            // User has requested that we validate their card number.
+            mCardEntryListener.onCardNumberInputComplete();
+            return true;
+        }
+
+        private boolean handleDelete() {
+            int curPos = getSelectionEnd();
+
+            if (mMaxCardLength == FieldHolder.NON_AMEX_CARD_LENGTH && (curPos == 5 || curPos == 10 || curPos == 15)) {
+                CardNumEditText.this.setSelection(curPos - 1);
+                return true;
+            } else if(mMaxCardLength == FieldHolder.AMEX_CARD_LENGTH && (curPos == 5 || curPos == 12)) {
+                CardNumEditText.this.setSelection(curPos - 1);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
 		public boolean deleteSurroundingText(int beforeLength, int afterLength) {
 			// magic: in latest Android, deleteSurroundingText(1, 0) will be
 			// called for backspace
@@ -196,10 +246,4 @@ public class CardNumEditText extends EditText {
 			return super.deleteSurroundingText(beforeLength, afterLength);
 		}
 	}
-
-	public String getLast4Digits() {
-		String text = getText().toString().replaceAll("\\s", "");
-		return text.substring(text.length() - 4, text.length());
-	}
-
 }

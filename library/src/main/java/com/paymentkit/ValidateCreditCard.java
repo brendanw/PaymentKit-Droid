@@ -119,7 +119,7 @@ public final class ValidateCreditCard {
 	}
 
 	public static CardType getCardType(String number) {
-		number = number.replaceAll(" ", "");
+		number = numericOnlyString(number);
 		if (number.toString().length() < 2)
 			return CardType.UNKNOWN_CARD;
 		String firstChars = number.toString().substring(0, 2);
@@ -186,7 +186,7 @@ public final class ValidateCreditCard {
 	 * @see com.mindprod.common11.ST#parseDirtyLong(String)
 	 */
 	public static long parseDirtyLong(String numStr) {
-		numStr = numStr.trim();
+		numStr = numericOnlyString(numStr);
 		// strip commas, spaces, + etc, AND -
 		// StringBuilder is better than FastCat for char by char work.
 		StringBuilder b = new StringBuilder(numStr.length());
@@ -202,6 +202,10 @@ public final class ValidateCreditCard {
 		}
 		return Long.parseLong(numStr);
 	}// end parseDirtyLong
+
+    public static String numericOnlyString(String string) {
+        return string.replaceAll("[\\D]", "");
+    }
 
 	// From http://www.icverify.com/
 	// Vendor Prefix len checkdigit

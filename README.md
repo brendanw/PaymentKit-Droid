@@ -21,5 +21,4 @@ Things to be added in the future:
 - AAR getting added to maven central
 - Better handling of spacing for landscape mode
 - Support for more cards
-- Ability to move cursor anywhere in expiration date field.
 - More error messaging ability options 

@@ -6,23 +6,20 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.CycleInterpolator;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
 
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.paymentkit.R;
 import com.paymentkit.ValidateCreditCard;
-import com.paymentkit.util.ToastUtils;
+import com.paymentkit.util.AnimUtils;
 import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
-public class CardNumHolder extends RelativeLayout {
+public class CardNumHolder extends FrameLayout {
 
 	private static final String TAG = CardNumHolder.class.getSimpleName();
-
-	private static final int SHAKE_DURATION = 400;
 
 	private CardNumEditText mCardNumberEditText;
 	private InterceptEditText mLastFourDigits;
@@ -51,6 +48,7 @@ public class CardNumHolder extends RelativeLayout {
 
 	private void setup() {
 		setClipChildren(false);
+        setAddStatesFromChildren(true);
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.pk_card_holder, this, true);
 		mCardNumberEditText = (CardNumEditText) findViewById(R.id.credit_card_no);
@@ -60,13 +58,10 @@ public class CardNumHolder extends RelativeLayout {
 
 	public boolean isCardNumValid() {
 		if (mCardNumberEditText.length() < mCardNumberEditText.getMaxCardLength()) {
-			ToastUtils.showToast(getContext(), getResources().getString(R.string.pk_error_invalid_card_no));
 			return false;
 		} else if (mCardNumberEditText.length() == mCardNumberEditText.getMaxCardLength()) {
 			if (ValidateCreditCard.isValid(Long.parseLong(getCardField().getText().toString().replaceAll("\\s", "")))) {
 				return true;
-			} else {
-				ToastUtils.showToast(getContext(), getResources().getString(R.string.pk_error_invalid_card_no));
 			}
 		}
 		return false;
@@ -104,11 +99,8 @@ public class CardNumHolder extends RelativeLayout {
 	}
 
 	public void indicateInvalidCardNum() {
-		getCardField().setTextColor(Color.RED);
 		mTopItem = mCardNumberEditText;
-		ObjectAnimator shakeAnim = ObjectAnimator.ofFloat(getCardField(), "translationX", -16);
-		shakeAnim.setDuration(SHAKE_DURATION);
-		shakeAnim.setInterpolator(new CycleInterpolator(2.0f));
+		ObjectAnimator shakeAnim = AnimUtils.getShakeAnimation(getCardField(), false);
 		shakeAnim.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(Animator anim) {
@@ -145,4 +137,9 @@ public class CardNumHolder extends RelativeLayout {
 		return mLeftOffset;
 	}
 
+    public void resetTextColor() {
+        if (mCardNumberEditText.getCurrentTextColor() != Color.DKGRAY) {
+            mCardNumberEditText.setTextColor(Color.DKGRAY);
+        }
+    }
 }

@@ -61,7 +61,8 @@
         android:layout_height="50dp"
         android:layout_below="@id/accepted_cards"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        style="?android:editTextStyle">
     </com.paymentkit.views.FieldHolder>
 
 </RelativeLayout>

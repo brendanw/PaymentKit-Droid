@@ -1,13 +1,13 @@
 apply plugin: 'android'
 
 android {
-    compileSdkVersion 7
+    compileSdkVersion 19
     buildToolsVersion "20.0.0"
 
     defaultConfig {
         applicationId "com.brendan.pkexample"
         minSdkVersion 8
-        targetSdkVersion 17
+        targetSdkVersion 19
     }
 
     buildTypes {

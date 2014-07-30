@@ -26,6 +26,7 @@
         android:layout_height="50dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:addStatesFromChildren="true"
         android:orientation="horizontal" >
 
         <com.paymentkit.views.ExpirationEditText
@@ -36,7 +37,7 @@
             android:layout_gravity="center"
             android:contentDescription="@string/pk_expiration_field_desc"
             android:hint="@string/pk_expiration_field_hint"
-            android:imeOptions="actionNext"
+            android:imeOptions="actionNext|flagNoExtractUi"
             android:inputType="number"
             android:maxLength="5"
             android:textSize="@dimen/pk_checkout_input_field_text_size"
@@ -51,7 +52,7 @@
             android:layout_marginLeft="40dp"
             android:contentDescription="Credit Card Security Code Field"
             android:hint=" CVV "
-            android:imeOptions="actionDone"
+            android:imeOptions="actionDone|flagNoExtractUi"
             android:inputType="number"
             android:maxLength="3"
             android:nextFocusRight="@null"
