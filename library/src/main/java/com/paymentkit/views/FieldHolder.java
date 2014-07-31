@@ -1,6 +1,7 @@
 package com.paymentkit.views;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -153,7 +154,8 @@ public class FieldHolder extends RelativeLayout {
 	}
 
 	private void validateCard() {
-		long cardNumber = Long.parseLong(mCardHolder.getCardField().getText().toString().replaceAll("\\s", ""));
+        String stringNumber = getCardNumber();
+		long cardNumber = !TextUtils.isEmpty(stringNumber) ? Long.parseLong(stringNumber) : 0;
 		if (ValidateCreditCard.isValid(cardNumber)) {
 			CardType cardType = ValidateCreditCard.matchCardType(cardNumber);
 			mCardIcon.setCardType(cardType);

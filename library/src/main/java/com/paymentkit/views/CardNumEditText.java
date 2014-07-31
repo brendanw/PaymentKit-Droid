@@ -64,6 +64,9 @@ public class CardNumEditText extends EditText {
 
 		@Override
 		public void afterTextChanged(Editable s) {
+            // Notify listener, will change card type.
+            mCardEntryListener.onEdit();
+
             // Remove our selves while we edit this text.
             removeTextChangedListener(this);
 
@@ -71,9 +74,6 @@ public class CardNumEditText extends EditText {
             boolean removedTwoFromEnd = formatText(s);
             fixSelectionPosition(s, oldSelectionPosition, removedTwoFromEnd);
 
-
-            // Notify listener
-            mCardEntryListener.onEdit();
             if (isCardNumberInputComplete()) {
                 mCardEntryListener.onCardNumberInputComplete();
             }

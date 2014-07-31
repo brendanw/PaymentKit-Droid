@@ -60,7 +60,8 @@ public class CardNumHolder extends FrameLayout {
 		if (mCardNumberEditText.length() < mCardNumberEditText.getMaxCardLength()) {
 			return false;
 		} else if (mCardNumberEditText.length() == mCardNumberEditText.getMaxCardLength()) {
-			if (ValidateCreditCard.isValid(Long.parseLong(getCardField().getText().toString().replaceAll("\\s", "")))) {
+            long cardNumber = Long.parseLong(ValidateCreditCard.numericOnlyString(getCardField().getText().toString()));
+			if (ValidateCreditCard.isValid(cardNumber)) {
 				return true;
 			}
 		}
