@@ -14,6 +14,7 @@ import android.widget.EditText;
 
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.paymentkit.util.AnimUtils;
+import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
 public class CVVEditText extends EditText {
@@ -61,9 +62,7 @@ public class CVVEditText extends EditText {
 	private OnFocusChangeListener mFocusListener = new OnFocusChangeListener() {
 		@Override
 		public void onFocusChange(View v, boolean hasFocus) {
-			if(hasFocus) {
-				mListener.onCVVEntry();
-			}
+            mListener.onCVVFocus(hasFocus);
 		}
 	};
 	
@@ -133,6 +132,14 @@ public class CVVEditText extends EditText {
 			return super.deleteSurroundingText(beforeLength, afterLength);
 		}
 	}
+
+    public void setTextWithoutValidation(CharSequence cvv) {
+        removeTextChangedListener(mTextWatcher);
+
+        ViewUtils.replaceAllText(getText(), cvv);
+
+        addTextChangedListener(mTextWatcher);
+    }
 	
 	private TextWatcher mTextWatcher = new TextWatcher() {
 		@Override

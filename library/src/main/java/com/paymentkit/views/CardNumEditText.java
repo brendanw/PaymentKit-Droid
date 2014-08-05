@@ -57,6 +57,14 @@ public class CardNumEditText extends EditText {
         return text.substring(text.length() - 4, text.length());
     }
 
+    public void setTextWithoutValidation(CharSequence text) {
+        removeTextChangedListener(mCardNumberTextWatcher);
+
+        ViewUtils.replaceAllText(getText(), text);
+
+        addTextChangedListener(mCardNumberTextWatcher);
+    }
+
 	TextWatcher mCardNumberTextWatcher = new TextWatcher() {
         /* Card Number Input Field Text Watcher */
         private boolean mTextAdded = true;
@@ -186,7 +194,7 @@ public class CardNumEditText extends EditText {
 		return new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
 	}
 
-	private class ZanyInputConnection extends InputConnectionWrapper {
+    private class ZanyInputConnection extends InputConnectionWrapper {
 
 		public ZanyInputConnection(InputConnection target, boolean mutable) {
 			super(target, mutable);

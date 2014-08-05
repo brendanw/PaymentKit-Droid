@@ -208,6 +208,14 @@ public class ExpirationEditText extends EditText {
 		return new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
 	}
 
+    public void setTextWithoutValidation(CharSequence text) {
+        removeTextChangedListener(mTextWatcher);
+
+        ViewUtils.replaceAllText(getText(), text);
+
+        addTextChangedListener(mTextWatcher);
+    }
+
     /*
      * See "android EditText delete(backspace) key event" on stackoverflow
      */
