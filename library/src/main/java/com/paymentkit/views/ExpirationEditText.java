@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
@@ -30,6 +31,7 @@ public class ExpirationEditText extends EditText {
 
 	private CardEntryListener mListener;
     private ObjectAnimator shakeAnim;
+    private ZanyInputConnection mInputConnection;
 
     public ExpirationEditText(Context context) {
 		super(context);
@@ -43,6 +45,7 @@ public class ExpirationEditText extends EditText {
 
 	private void setup() {
 		addTextChangedListener(mTextWatcher);
+        setOnKeyListener(new ZanyKeyListener());
 	}
 
 	@Override
@@ -203,10 +206,46 @@ public class ExpirationEditText extends EditText {
         shakeAnim.start();
     }
 
+    public void setTextWithoutValidation(CharSequence text) {
+        removeTextChangedListener(mTextWatcher);
+
+        ViewUtils.replaceAllText(getText(), text);
+
+        addTextChangedListener(mTextWatcher);
+    }
+
+    /////////////////
+    // Input Methods
+    /////////////////
+
 	@Override
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-		return new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
+        mInputConnection = new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
+		return mInputConnection;
 	}
+
+    /**
+     * invoked when a hardware key event is dispatched to this view.
+     * We will make all calls to our input connection.
+     */
+    private class ZanyKeyListener implements OnKeyListener {
+
+        @Override
+        public boolean onKey(View v, int keyCode, KeyEvent event) {
+            boolean shouldConsume = false;
+            if (event.getAction() == KeyEvent.ACTION_DOWN && mInputConnection != null) {
+                switch (event.getKeyCode()) {
+                    case KeyEvent.KEYCODE_DEL: shouldConsume = mInputConnection.handleDelete(); break;
+                    // On a hardware keyboard IME_ACTION_NEXT will come as an enter key.
+                    case KeyEvent.KEYCODE_ENTER:
+                        shouldConsume = true;
+                        mInputConnection.performEditorAction(EditorInfo.IME_ACTION_NEXT); break;
+                }
+            }
+            // soft-keyboard uses downs while hard uses ups.
+            return shouldConsume || event.getAction() == KeyEvent.ACTION_UP;
+        }
+    }
 
     /*
      * See "android EditText delete(backspace) key event" on stackoverflow
@@ -225,9 +264,10 @@ public class ExpirationEditText extends EditText {
 			return super.sendKeyEvent(event);
 		}
 
-        private void handleDelete() {
+        private boolean handleDelete() {
             if (getSelectionEnd() == 0) {
                 mListener.onCardNumberInputReEntry();
+                return true;
             }
             int index = getText().toString().indexOf("/");
             if (index != -1 && getSelectionEnd() == (index + 1) && length() == (index + 1)){
@@ -235,6 +275,7 @@ public class ExpirationEditText extends EditText {
                 ViewUtils.replaceAllText(getText(), getText().toString().substring(0, length() - 1));
                 addTextChangedListener(mTextWatcher);
             }
+            return false;
         }
 
 		@Override

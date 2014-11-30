@@ -1,6 +1,7 @@
 package com.paymentkit.views;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
+import com.nineoldandroids.view.ViewHelper;
 import com.paymentkit.CardType;
 import com.paymentkit.R;
 import com.paymentkit.ValidateCreditCard;
@@ -38,7 +40,7 @@ public class FieldHolder extends RelativeLayout {
 	private CardIcon mCardIcon;
 	private LinearLayout mExtraFields;
 
-    private OnCardValidListener mCardValidListener;
+    protected OnCardValidListener mCardValidListener;
 
     public FieldHolder(Context context) {
 		super(context);
@@ -141,9 +143,7 @@ public class FieldHolder extends RelativeLayout {
 	}
 	
 	private void setExtraFieldsAlpha() {
-		ObjectAnimator setAlphaZero = ObjectAnimator.ofFloat(mExtraFields, "alpha", 0.0f);
-		setAlphaZero.setDuration(0);
-		setAlphaZero.start();
+        ViewHelper.setAlpha(mExtraFields, 0.0f);
 		mExtraFields.setVisibility(View.GONE);
 	}
 
@@ -153,7 +153,8 @@ public class FieldHolder extends RelativeLayout {
 	}
 
 	private void validateCard() {
-		long cardNumber = Long.parseLong(mCardHolder.getCardField().getText().toString().replaceAll("\\s", ""));
+        String stringNumber = getCardNumber();
+		long cardNumber = !TextUtils.isEmpty(stringNumber) ? Long.parseLong(stringNumber) : 0;
 		if (ValidateCreditCard.isValid(cardNumber)) {
 			CardType cardType = ValidateCreditCard.matchCardType(cardNumber);
 			mCardIcon.setCardType(cardType);
@@ -163,7 +164,7 @@ public class FieldHolder extends RelativeLayout {
 		}
 	}
 
-	private void transitionToExtraFields() {
+	protected void transitionToExtraFields() {
 		// CREATE LAST 4 DIGITS OVERLAY
 		mCardHolder.createOverlay();
 
@@ -193,10 +194,38 @@ public class FieldHolder extends RelativeLayout {
 		mExpirationEditText.requestFocus();
 	}
 
+    protected void transitionToCardNumField() {
+        mCardIcon.flipTo(CardFace.FRONT);
+        AnimatorSet set = new AnimatorSet();
+
+        mCardHolder.getCardField().setVisibility(View.VISIBLE);
+        ObjectAnimator alphaOut = ObjectAnimator.ofFloat(mExtraFields, "alpha", 0.0f);
+        alphaOut.setDuration(RE_ENTRY_ALPHA_OUT_DURATION);
+        alphaOut.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator anim) {
+                mExtraFields.setVisibility(View.GONE);
+                mCardHolder.destroyOverlay();
+                mCardHolder.getCardField().requestFocus();
+                mCardHolder.getCardField().setSelection(mCardHolder.getCardField().length());
+            }
+        });
+
+        ObjectAnimator alphaIn = ObjectAnimator.ofFloat(mCardHolder.getCardField(), "alpha", 0.5f, 1.0f);
+        alphaIn.setDuration(RE_ENTRY_ALPHA_IN_DURATION);
+
+        ObjectAnimator overShoot = ObjectAnimator.ofFloat(mCardHolder, "translationX", -mCardHolder.getLeftOffset(), 0.0f);
+        overShoot.setInterpolator(new OvershootInterpolator());
+        overShoot.setDuration(RE_ENTRY_OVERSHOOT_DURATION);
+
+        set.playTogether(alphaOut, alphaIn, overShoot);
+        set.start();
+    }
+
     /** @return true if it focuses on an invalid field. **/
     private boolean focusOnInvalidField() {
         if (!mCardHolder.isCardNumValid()) {
-            transitionToExtraFields();
+            transitionToCardNumField();
             return true;
         }
         if (!mExpirationEditText.isValid()) {
@@ -223,6 +252,8 @@ public class FieldHolder extends RelativeLayout {
 
 		void onCardNumberInputReEntry();
 
+        void onCVVFocus(boolean hasFocus);
+
 		void onCVVEntry();
 
 		void onCVVEntryComplete();
@@ -231,7 +262,7 @@ public class FieldHolder extends RelativeLayout {
 
 	}
 
-	CardEntryListener mCardEntryListener = new CardEntryListener() {
+	protected CardEntryListener mCardEntryListener = new CardEntryListener() {
 		@Override
 		public void onCardNumberInputComplete() {
 			validateCard();
@@ -255,36 +286,20 @@ public class FieldHolder extends RelativeLayout {
 
 		@Override
 		public void onCardNumberInputReEntry() {
-			mCardIcon.flipTo(CardFace.FRONT);
-			AnimatorSet set = new AnimatorSet();
-
-			mCardHolder.getCardField().setVisibility(View.VISIBLE);
-			ObjectAnimator alphaOut = ObjectAnimator.ofFloat(mExtraFields, "alpha", 0.0f);
-			alphaOut.setDuration(RE_ENTRY_ALPHA_OUT_DURATION);
-			alphaOut.addListener(new AnimatorListenerAdapter() {
-				@Override
-				public void onAnimationEnd(Animator anim) {
-					mExtraFields.setVisibility(View.GONE);
-					mCardHolder.destroyOverlay();
-					mCardHolder.getCardField().requestFocus();
-					mCardHolder.getCardField().setSelection(mCardHolder.getCardField().length());
-				}
-			});
-
-			ObjectAnimator alphaIn = ObjectAnimator.ofFloat(mCardHolder.getCardField(), "alpha", 0.5f, 1.0f);
-			alphaIn.setDuration(RE_ENTRY_ALPHA_IN_DURATION);
-
-			ObjectAnimator overShoot = ObjectAnimator.ofFloat(mCardHolder, "translationX", -mCardHolder.getLeftOffset(), 0.0f);
-			overShoot.setInterpolator(new OvershootInterpolator());
-			overShoot.setDuration(RE_ENTRY_OVERSHOOT_DURATION);
-
-			set.playTogether(alphaOut, alphaIn, overShoot);
-			set.start();
+            transitionToCardNumField();
 		}
 
-		@Override
+        @Override
+        public void onCVVFocus(boolean hasFocus) {
+            if (hasFocus) {
+                mCardIcon.flipTo(CardFace.BACK);
+            } else {
+                mCardIcon.flipTo(CardFace.FRONT);
+            }
+        }
+
+        @Override
 		public void onCVVEntry() {
-			mCardIcon.flipTo(CardFace.BACK);
 			mCVVEditText.requestFocus();
 		}
 
@@ -300,7 +315,6 @@ public class FieldHolder extends RelativeLayout {
 		@Override
 		public void onBackFromCVV() {
 			mExpirationEditText.requestFocus();
-			mCardIcon.flipTo(CardFace.FRONT);
 		}
 
 	};

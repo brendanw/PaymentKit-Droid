@@ -14,6 +14,7 @@ import android.widget.EditText;
 
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.paymentkit.util.AnimUtils;
+import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
 public class CVVEditText extends EditText {
@@ -25,6 +26,7 @@ public class CVVEditText extends EditText {
 	private static final String TAG = CVVEditText.class.getSimpleName();
 	
 	private CardEntryListener mListener;
+    private ZanyInputConnection mInputConnection;
 
     private ObjectAnimator shakeAnim;
 
@@ -41,6 +43,7 @@ public class CVVEditText extends EditText {
 	private void setup() {
 		addTextChangedListener(mTextWatcher);
 		setOnFocusChangeListener(mFocusListener);
+        setOnKeyListener(new ZanyKeyListener());
 	}
 
     public boolean isValid() {
@@ -61,22 +64,72 @@ public class CVVEditText extends EditText {
 	private OnFocusChangeListener mFocusListener = new OnFocusChangeListener() {
 		@Override
 		public void onFocusChange(View v, boolean hasFocus) {
-			if(hasFocus) {
-				mListener.onCVVEntry();
-			}
+            mListener.onCVVFocus(hasFocus);
 		}
 	};
-	
-	@Override
-	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-		return new ZanyInputConnection(super.onCreateInputConnection(outAttrs),
-				true);
-	}
 
     public void indicateInvalidCVV() {
         if (shakeAnim != null) shakeAnim.end();
         shakeAnim = AnimUtils.getShakeAnimation(this, true);
         shakeAnim.start();
+    }
+
+    private TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (s.length() == cvvMaxLength) {
+                mListener.onCVVEntryComplete();
+            }
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count,
+                                      int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before,
+                                  int count) {
+        }
+    };
+
+    public void setTextWithoutValidation(CharSequence cvv) {
+        removeTextChangedListener(mTextWatcher);
+
+        ViewUtils.replaceAllText(getText(), cvv);
+
+        addTextChangedListener(mTextWatcher);
+    }
+
+    /////////////////
+    // Input Methods
+    /////////////////
+
+    @Override
+    public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+        mInputConnection = new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
+        return mInputConnection;
+    }
+
+    /**
+     * invoked when a hardware key event is dispatched to this view.
+     * We will make all calls to our input connection.
+     */
+    private class ZanyKeyListener implements OnKeyListener {
+
+        @Override
+        public boolean onKey(View v, int keyCode, KeyEvent event) {
+            boolean shouldConsume = false;
+            if (event.getAction() == KeyEvent.ACTION_DOWN && mInputConnection != null) {
+                switch (event.getKeyCode()) {
+                    case KeyEvent.KEYCODE_DEL: shouldConsume = mInputConnection.handleDelete(); break;
+                    // On a hardware keyboard IME_ACTION_NEXT will come as an enter key.
+                    case KeyEvent.KEYCODE_ENTER: shouldConsume = mInputConnection.handleNextPress(); break;
+                }
+            }
+            // soft-keyboard uses downs while hard uses ups.
+            return shouldConsume || event.getAction() == KeyEvent.ACTION_UP;
+        }
     }
 
     /*
@@ -94,14 +147,10 @@ public class CVVEditText extends EditText {
 			if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 switch (event.getKeyCode()) {
                     case KeyEvent.KEYCODE_DEL:
-                        if(getSelectionStart() == 0) {
-                            mListener.onBackFromCVV();
-                            shouldConsume = true;
-                        }
+                        shouldConsume = handleDelete();
                         break;
                     case KeyEvent.KEYCODE_ENTER:
-                        shouldConsume = true;
-                        mListener.onCVVEntryComplete(); break;
+                        shouldConsume = handleNextPress(); break;
                 }
             }
 			return shouldConsume ? true : super.sendKeyEvent(event);
@@ -132,25 +181,19 @@ public class CVVEditText extends EditText {
 
 			return super.deleteSurroundingText(beforeLength, afterLength);
 		}
+
+        private boolean handleNextPress() {
+            mListener.onCVVEntryComplete();
+            return true;
+        }
+
+        private boolean handleDelete() {
+            if(getSelectionStart() == 0) {
+                mListener.onBackFromCVV();
+                return true;
+            }
+            return false;
+        }
 	}
-	
-	private TextWatcher mTextWatcher = new TextWatcher() {
-		@Override
-		public void afterTextChanged(Editable s) {
-			if (s.length() == cvvMaxLength) {
-				mListener.onCVVEntryComplete();
-			}
-		}
-
-		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count,
-				int after) {
-		}
-
-		@Override
-		public void onTextChanged(CharSequence s, int start, int before,
-				int count) {
-		}
-	};
 
 }

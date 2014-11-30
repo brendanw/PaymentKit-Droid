@@ -6,6 +6,7 @@ import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
@@ -22,8 +23,9 @@ public class CardNumEditText extends EditText {
 	private CardEntryListener mCardEntryListener;
 
 	private int mMaxCardLength = FieldHolder.NON_AMEX_CARD_LENGTH;
+    private ZanyInputConnection mInputConnection;
 
-	public CardNumEditText(Context context) {
+    public CardNumEditText(Context context) {
 		super(context);
 		setup();
 	}
@@ -35,6 +37,7 @@ public class CardNumEditText extends EditText {
 
 	private void setup() {
 		addTextChangedListener(mCardNumberTextWatcher);
+        setOnKeyListener(new ZanyKeyListener());
 	}
 
 	public void setCardEntryListener(CardEntryListener listener) {
@@ -57,6 +60,14 @@ public class CardNumEditText extends EditText {
         return text.substring(text.length() - 4, text.length());
     }
 
+    public void setTextWithoutValidation(CharSequence text) {
+        removeTextChangedListener(mCardNumberTextWatcher);
+
+        ViewUtils.replaceAllText(getText(), text);
+
+        addTextChangedListener(mCardNumberTextWatcher);
+    }
+
 	TextWatcher mCardNumberTextWatcher = new TextWatcher() {
         /* Card Number Input Field Text Watcher */
         private boolean mTextAdded = true;
@@ -64,6 +75,9 @@ public class CardNumEditText extends EditText {
 
 		@Override
 		public void afterTextChanged(Editable s) {
+            // Notify listener, will change card type.
+            mCardEntryListener.onEdit();
+
             // Remove our selves while we edit this text.
             removeTextChangedListener(this);
 
@@ -71,9 +85,6 @@ public class CardNumEditText extends EditText {
             boolean removedTwoFromEnd = formatText(s);
             fixSelectionPosition(s, oldSelectionPosition, removedTwoFromEnd);
 
-
-            // Notify listener
-            mCardEntryListener.onEdit();
             if (isCardNumberInputComplete()) {
                 mCardEntryListener.onCardNumberInputComplete();
             }
@@ -183,10 +194,32 @@ public class CardNumEditText extends EditText {
 
 	@Override
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-		return new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
+        mInputConnection = new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);;
+		return mInputConnection;
 	}
 
-	private class ZanyInputConnection extends InputConnectionWrapper {
+    /**
+     * invoked when a hardware key event is dispatched to this view.
+     * We will make all calls to our input connection.
+     */
+    private class ZanyKeyListener implements OnKeyListener {
+
+        @Override
+        public boolean onKey(View v, int keyCode, KeyEvent event) {
+            boolean shouldConsume = false;
+            if (event.getAction() == KeyEvent.ACTION_DOWN && mInputConnection != null) {
+                switch (event.getKeyCode()) {
+                    case KeyEvent.KEYCODE_DEL: shouldConsume = mInputConnection.handleDelete(); break;
+                    // On a hardware keyboard IME_ACTION_NEXT will come as an enter key.
+                    case KeyEvent.KEYCODE_ENTER: shouldConsume = mInputConnection.handleNextPress(); break;
+                }
+            }
+            // soft-keyboard uses downs while hard uses ups.
+            return shouldConsume || event.getAction() == KeyEvent.ACTION_UP;
+        }
+    }
+
+    private class ZanyInputConnection extends InputConnectionWrapper {
 
 		public ZanyInputConnection(InputConnection target, boolean mutable) {
 			super(target, mutable);
@@ -214,6 +247,19 @@ public class CardNumEditText extends EditText {
             return shouldConsume ? true : super.performEditorAction(editorAction);
         }
 
+        @Override
+		public boolean deleteSurroundingText(int beforeLength, int afterLength) {
+			// magic: in latest Android, deleteSurroundingText(1, 0) will be
+			// called for backspace
+            if (beforeLength == 1 && afterLength == 0) {
+                // backspace
+                return sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
+                        && sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
+            }
+
+			return super.deleteSurroundingText(beforeLength, afterLength);
+		}
+
         private boolean handleNextPress() {
             // User has requested that we validate their card number.
             mCardEntryListener.onCardNumberInputComplete();
@@ -232,18 +278,5 @@ public class CardNumEditText extends EditText {
             }
             return false;
         }
-
-        @Override
-		public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-			// magic: in latest Android, deleteSurroundingText(1, 0) will be
-			// called for backspace
-			if (beforeLength == 1 && afterLength == 0) {
-				// backspace
-				return sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-						&& sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
-			}
-
-			return super.deleteSurroundingText(beforeLength, afterLength);
-		}
 	}
 }
