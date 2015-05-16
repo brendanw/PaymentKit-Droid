@@ -25,3 +25,17 @@ android {
 dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
 }
+
+apply plugin: 'maven'
+
+uploadArchives {
+
+    def artifact_id = project.projectDir.getName().toLowerCase()
+
+    repositories.mavenDeployer {
+        pom.groupId = "com.paymentkit"
+        pom.artifactId = artifact_id
+        pom.version = "1.0.0"
+        repository(url: "file://localhost/tmp/myRepo/")
+    }
+}
