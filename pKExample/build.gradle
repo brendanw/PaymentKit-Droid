@@ -19,6 +19,6 @@ android {
 }
 
 dependencies {
-    compile project(':library')
+    compile project(':pk-library')
     compile 'com.android.support:support-v4:20.+'
 }

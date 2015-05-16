@@ -1,1 +1,1 @@
-include ':library', ":pKExample"
+include ':pk-library', ":pKExample"

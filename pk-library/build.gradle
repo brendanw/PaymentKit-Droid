@@ -30,8 +30,8 @@ apply plugin: 'maven'
 
 // ext is a gradle closure allowing the declaration of global properties
 ext {
-    PUBLISH_GROUP_ID = 'com.paymentkit'
-    PUBLISH_ARTIFACT_ID = 'library'
+    PUBLISH_GROUP_ID = 'com.brendanw.paymentkit'
+    PUBLISH_ARTIFACT_ID = 'paymentkitdroid'
     PUBLISH_VERSION = '1.0.0'
 }
 
