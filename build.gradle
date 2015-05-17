@@ -3,6 +3,9 @@ buildscript {
 
     repositories {
         jcenter()
+        maven {
+            url  "http://dl.bintray.com/brendanw/maven"
+        }
     }
 
     dependencies {
@@ -12,5 +15,8 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        maven {
+            url  "http://dl.bintray.com/brendanw/maven"
+        }
     }
 }

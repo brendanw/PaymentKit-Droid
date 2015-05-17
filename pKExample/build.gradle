@@ -19,6 +19,7 @@ android {
 }
 
 dependencies {
-    compile project(':pk-library')
+    //compile project(':pk-library')
+    compile 'com.brendanw.paymentkit:paymentkit-droid:1.0.0'
     compile 'com.android.support:support-v4:20.+'
 }
