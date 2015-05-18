@@ -166,10 +166,10 @@ public class FieldHolder extends RelativeLayout {
   }
 
   protected void transitionToExtraFields() {
-    // CREATE LAST 4 DIGITS OVERLAY
+    /** CREATE LAST 4 DIGITS OVERLAY */
     mCardHolder.createOverlay();
 
-    // MOVE CARD NUMBER TO LEFT AND ALPHA OUT
+    /** MOVE CARD NUMBER TO LEFT AND ALPHA OUT */
     AnimatorSet set = new AnimatorSet();
     ViewUtils.setHardwareLayer(mCardHolder);
     ObjectAnimator translateAnim = ObjectAnimator.ofFloat(mCardHolder, "translationX", -mCardHolder.getLeftOffset());
@@ -185,7 +185,7 @@ public class FieldHolder extends RelativeLayout {
       }
     });
 
-    // ALPHA IN OTHER FIELDS
+    /** ALPHA IN OTHER FIELDS */
     mExtraFields.setVisibility(View.VISIBLE);
     ObjectAnimator alphaIn = ObjectAnimator.ofFloat(mExtraFields, "alpha", 1.0f);
     alphaIn.setDuration(500);
@@ -245,7 +245,7 @@ public class FieldHolder extends RelativeLayout {
   }
 
   public interface OnCardValidListener {
-    public void cardIsValid();
+    void cardIsValid();
   }
 
   protected interface CardEntryListener {
