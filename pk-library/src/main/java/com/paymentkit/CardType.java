@@ -9,7 +9,8 @@ public enum CardType {
 	DINERS_CLUB(6, "Diners Club", false, 3),
 	UNKNOWN_CARD(7, "Unknown", true, 3),
 	TOO_MANY_DIGITS(8, "Too Many Digits", true, 3),
-	NOT_ENOUGH_DIGITS(9, "Not Enough Digits", true, 3);
+	NOT_ENOUGH_DIGITS(9, "Not Enough Digits", true, 3),
+	PAYPAL(10, false, "", 0);
 
 	private int mVal;
 	private String mName;
