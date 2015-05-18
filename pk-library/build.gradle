@@ -77,6 +77,13 @@ task generateRelease << {
     println "Release ${version} zipped can be found ${buildDir}/release-${version}.zip"
 }
 
+task zipSignedFolder(type: Zip) {
+    def signedFolderLocation = "${buildDir}/wrapper"
+    from signedFolderLocation
+    destinationDir buildDir
+    archiveName "release-${version}-signed.zip"
+}
+
 generateRelease.dependsOn(uploadArchives)
 generateRelease.dependsOn(zipRelease)
 
