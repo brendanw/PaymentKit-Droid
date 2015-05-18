@@ -141,6 +141,8 @@ public class FieldHolder extends RelativeLayout {
   private void setNecessaryFields() {
     setClipChildren(false);
     setAddStatesFromChildren(true);
+    setFocusable(true);
+    setFocusableInTouchMode(true);
   }
 
   private void setExtraFieldsAlpha() {
@@ -310,8 +312,9 @@ public class FieldHolder extends RelativeLayout {
     public void onCVVEntryComplete() {
       if (!focusOnInvalidField()) {
         mCardIcon.flipTo(CardFace.FRONT);
-        if (mCardValidListener != null) mCardValidListener.cardIsValid();
-        // complete
+        if (mCardValidListener != null) {
+          mCardValidListener.cardIsValid();
+        }
       }
     }
 
