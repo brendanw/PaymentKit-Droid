@@ -310,12 +310,12 @@ public class FieldHolder extends RelativeLayout {
 
     @Override
     public void onCVVEntryComplete() {
-      if (!focusOnInvalidField()) {
+      //if (!focusOnInvalidField()) {
         mCardIcon.flipTo(CardFace.FRONT);
         if (mCardValidListener != null) {
           mCardValidListener.cardIsValid();
         }
-      }
+      //}
     }
 
     @Override
