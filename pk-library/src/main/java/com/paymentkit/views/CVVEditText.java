@@ -19,11 +19,11 @@ import com.paymentkit.views.FieldHolder.CardEntryListener;
 
 public class CVVEditText extends EditText {
 
+  private static final String TAG = CVVEditText.class.getSimpleName();
+
   public static final int CCV_LENGTH = 3;
   public static final int CCV_AMEX_LENGTH = 4;
   private int cvvMaxLength = CCV_LENGTH;
-
-  private static final String TAG = CVVEditText.class.getSimpleName();
 
   private CardEntryListener mListener;
   private ZanyInputConnection mInputConnection;
@@ -42,7 +42,7 @@ public class CVVEditText extends EditText {
 
   private void setup() {
     addTextChangedListener(mTextWatcher);
-    //setOnFocusChangeListener(mFocusListener);
+    setOnFocusChangeListener(mFocusListener);
     setOnKeyListener(new ZanyKeyListener());
   }
 
@@ -64,7 +64,11 @@ public class CVVEditText extends EditText {
   private OnFocusChangeListener mFocusListener = new OnFocusChangeListener() {
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-      mListener.onCVVFocus(hasFocus);
+      if(hasFocus) {
+        mListener.onCVVEntry();
+      } else {
+        mListener.onCVVEntryComplete();
+      }
     }
   };
 

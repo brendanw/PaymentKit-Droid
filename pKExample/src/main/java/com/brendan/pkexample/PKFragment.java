@@ -37,6 +37,7 @@ public class PKFragment extends Fragment {
       @Override
       public void cardIsValid() {
         mFieldHolder.requestFocus();
+        ViewUtils.hideSoftKeyboard(getActivity());
       }
     });
     mSaveBtn.setOnClickListener(mSaveBtnListener);
@@ -61,7 +62,6 @@ public class PKFragment extends Fragment {
     ViewUtils.setWidth(mFieldHolder, (int) (INPUT_WIDTH * ViewUtils.getScreenWidth(getActivity())));
   }
 
-  /* After onCreateView is called */
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);

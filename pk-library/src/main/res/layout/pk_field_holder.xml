@@ -52,7 +52,7 @@
             android:layout_marginLeft="40dp"
             android:contentDescription="Credit Card Security Code Field"
             android:hint=" CVV "
-            android:imeOptions="actionDone|flagNoExtractUi"
+            android:imeOptions="actionDone"
             android:inputType="number"
             android:maxLength="3"
             android:nextFocusRight="@null"
