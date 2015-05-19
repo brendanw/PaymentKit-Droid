@@ -1,25 +1,28 @@
 package com.paymentkit.views;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.animation.CycleInterpolator;
+import android.widget.RelativeLayout;
 
-import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.animation.AnimatorListenerAdapter;
-import com.nineoldandroids.animation.ObjectAnimator;
 import com.paymentkit.R;
 import com.paymentkit.ValidateCreditCard;
-import com.paymentkit.util.AnimUtils;
+import com.paymentkit.util.ToastUtils;
 import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
-public class CardNumHolder extends FrameLayout {
+public class CardNumHolder extends RelativeLayout {
 
 	private static final String TAG = CardNumHolder.class.getSimpleName();
+
+	private static final int SHAKE_DURATION = 400;
 
 	private CardNumEditText mCardNumberEditText;
 	private InterceptEditText mLastFourDigits;
@@ -48,7 +51,6 @@ public class CardNumHolder extends FrameLayout {
 
 	private void setup() {
 		setClipChildren(false);
-        setAddStatesFromChildren(true);
 		LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.pk_card_holder, this, true);
 		mCardNumberEditText = (CardNumEditText) findViewById(R.id.credit_card_no);
@@ -58,11 +60,13 @@ public class CardNumHolder extends FrameLayout {
 
 	public boolean isCardNumValid() {
 		if (mCardNumberEditText.length() < mCardNumberEditText.getMaxCardLength()) {
+			ToastUtils.showToast(getContext(), "Please enter a valid card number");
 			return false;
 		} else if (mCardNumberEditText.length() == mCardNumberEditText.getMaxCardLength()) {
-            long cardNumber = Long.parseLong(ValidateCreditCard.numericOnlyString(getCardField().getText().toString()));
-			if (ValidateCreditCard.isValid(cardNumber)) {
+			if (ValidateCreditCard.isValid(Long.parseLong(getCardField().getText().toString().replaceAll("\\s", "")))) {
 				return true;
+			} else {
+				ToastUtils.showToast(getContext(), "Please enter a valid card number");
 			}
 		}
 		return false;
@@ -100,8 +104,11 @@ public class CardNumHolder extends FrameLayout {
 	}
 
 	public void indicateInvalidCardNum() {
+		getCardField().setTextColor(Color.RED);
 		mTopItem = mCardNumberEditText;
-		ObjectAnimator shakeAnim = AnimUtils.getShakeAnimation(getCardField(), false);
+		ObjectAnimator shakeAnim = ObjectAnimator.ofFloat(getCardField(), "translationX", -16);
+		shakeAnim.setDuration(SHAKE_DURATION);
+		shakeAnim.setInterpolator(new CycleInterpolator(2.0f));
 		shakeAnim.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(Animator anim) {
@@ -138,9 +145,4 @@ public class CardNumHolder extends FrameLayout {
 		return mLeftOffset;
 	}
 
-    public void resetTextColor() {
-        if (mCardNumberEditText.getCurrentTextColor() != Color.DKGRAY) {
-            mCardNumberEditText.setTextColor(Color.DKGRAY);
-        }
-    }
 }

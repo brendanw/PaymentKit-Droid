@@ -33,13 +33,6 @@ public class PKFragment extends Fragment {
     mSaveBtn = (Button) viewRoot.findViewById(R.id.save_btn);
     mAcceptedCardsImg = (ImageView) viewRoot.findViewById(R.id.accepted_cards);
     mFieldHolder = (FieldHolder) viewRoot.findViewById(R.id.field_holder);
-    mFieldHolder.setOnCardValidListener(new FieldHolder.OnCardValidListener() {
-      @Override
-      public void cardIsValid() {
-        mFieldHolder.requestFocus();
-        ViewUtils.hideSoftKeyboard(getActivity());
-      }
-    });
     mSaveBtn.setOnClickListener(mSaveBtnListener);
     return viewRoot;
   }

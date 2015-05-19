@@ -1,295 +1,192 @@
 package com.paymentkit.views;
 
+import java.util.Calendar;
+
 import android.content.Context;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
-import com.nineoldandroids.animation.ObjectAnimator;
-import com.paymentkit.util.AnimUtils;
-import com.paymentkit.util.ViewUtils;
 import com.paymentkit.views.FieldHolder.CardEntryListener;
 
-import java.util.Calendar;
-
 /**
+ * 
  * @author Brendan Weinstein
- *         http://www.brendanweinstein.me
+ * http://www.brendanweinstein.me
+ *
  */
 public class ExpirationEditText extends EditText {
 
-  private static final String TAG = ExpirationEditText.class.getSimpleName();
+	private static final String TAG = ExpirationEditText.class.getSimpleName();
 
-  private CardEntryListener mListener;
-  private ObjectAnimator shakeAnim;
-  private ZanyInputConnection mInputConnection;
+	private CardEntryListener mListener;
 
-  public ExpirationEditText(Context context) {
-    super(context);
-    setup();
-  }
+	public ExpirationEditText(Context context) {
+		super(context);
+		setup();
+	}
 
-  public ExpirationEditText(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    setup();
-  }
+	public ExpirationEditText(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		setup();
+	}
 
-  private void setup() {
-    addTextChangedListener(mTextWatcher);
-    setOnKeyListener(new ZanyKeyListener());
-  }
+	private void setup() {
+		addTextChangedListener(mTextWatcher);
+	}
 
-  @Override
-  public void onSelectionChanged(int start, int end) {
-    int monthLength = getMonth().length();
-    // We only care about the end
-    if (end <= monthLength) {
-      setSelection(monthLength);
-      super.onSelectionChanged(monthLength, monthLength);
-    } else {
-      setSelection(length());
-      super.onSelectionChanged(length(), length());
-    }
-  }
+	@Override
+	public void onSelectionChanged(int start, int end) {
+		CharSequence text = getText();
+		if (text != null) {
+			if (start != text.length() || end != text.length()) {
+				setSelection(text.length(), text.length());
+				return;
+			}
+		}
 
-  public void setCardEntryListener(CardEntryListener listener) {
-    mListener = listener;
-  }
+		super.onSelectionChanged(start, end);
+	}
 
-  /* Expiration Input Field Text Watcher */
-  private boolean mTextAdded = true;
-  private int mPrevLength = 0;
+	public void setCardEntryListener(CardEntryListener listener) {
+		mListener = listener;
+	}
 
-  TextWatcher mTextWatcher = new TextWatcher() {
+	/* Expiration Input Field Text Watcher */
+	private boolean mTextAdded = true; // denotes if a character was added or
+																			// removed in last text change
+	private int mPrevLength = 0;
 
-    @Override
-    public void afterTextChanged(Editable s) {
-      removeTextChangedListener(this);
+	TextWatcher mTextWatcher = new TextWatcher() {
 
-      validateAndFormatText(s);
+		@Override
+		public void afterTextChanged(Editable s) {
+			if (mTextAdded && length() == 1) {
 
-      addTextChangedListener(this);
-    }
+				// tens place of month validation
+				int tensPlace = Integer.parseInt(getText().subSequence(0, 1).toString());
+				if (tensPlace > 1) {
+					setText("");
+					setSelection(length());
+				}
 
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-      mPrevLength = length();
-    }
+			} else if (mTextAdded && length() == 2) {
 
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-      mTextAdded = length() - mPrevLength > 0;
-    }
+				// one places of month validation
+				int tensPlace = Integer.parseInt(getText().subSequence(0, 1).toString());
+				int onesPlace = Integer.parseInt(getText().subSequence(1, 2).toString());
+				if ((tensPlace == 1 && onesPlace > 2) || (tensPlace == 0 && onesPlace == 0)) {
+					setText(getText().subSequence(0, 1));
+					setSelection(length());
+				} else {
+					setText(getText().subSequence(0, 2) + "/");
+					setSelection(length());
+				}
 
+			} else if (mTextAdded && length() == 4) {
 
-    private void validateAndFormatText(Editable s) {
-      CharSequence month = validateMonth(getMonth());
-      CharSequence year = validateYear(getYearAbv());
+				// tens place of year validation
+				Integer year = Calendar.getInstance().get(Calendar.YEAR); // 2013
+				int curTensPlace = Integer.parseInt(year.toString().substring(2, 3)); // 1
+				int inputTensPlace = Integer.parseInt(Character.toString(getText().charAt(3))); // 5
 
-      if (didValidationPass(month, year)) {
-        mListener.onCVVEntry();
-      } else if (month.length() == 2 || !TextUtils.isEmpty(year)) {
-        ViewUtils.replaceAllText(s, month + "/" + year);
-      } else {
-        ViewUtils.replaceAllText(s, month);
-      }
-      // If the month len is 2 that means its good so send them to the year.
-      if (month.length() == 2) setSelection(s.length());
-    }
+				if (inputTensPlace < curTensPlace) {
+					setText(getText().subSequence(0, length() - 1));
+					setSelection(length());
+				}
 
-    private boolean didValidationPass(CharSequence month, CharSequence year) {
-      return month.length() == 2 && year.length() == 2;
-    }
+			} else if (mTextAdded && length() == 5) {
 
+				// ones place of year validation
+				Integer year = Calendar.getInstance().get(Calendar.YEAR);
+				int curMonth = Calendar.getInstance().get(Calendar.MONTH);
+				int curYear = Integer.parseInt(year.toString().substring(2, 4));
+				int inputMonth = Integer.parseInt(getText().toString().substring(0, 2));
+				int inputYear = Integer.parseInt(getText().toString().substring(3, 5));
+				if (inputYear < curYear || ((inputMonth < curMonth) && inputYear == curYear)) {
+					setText(getText().subSequence(0, 4));
+					setSelection(length());
+				} else {
+					mListener.onCVVEntry();
+				}
 
-    private CharSequence validateMonth(String monthStr) {
-      if (TextUtils.isEmpty(monthStr)) return "";
-      // tens place of month validation
-      int tensPlace = Integer.parseInt(getText().subSequence(0, 1).toString());
-      if (mTextAdded && monthStr.length() == 1) {
-        if (tensPlace > 1) {
-          return truncateAndIndicateInvalid("");
-        }
-      } else if (mTextAdded && length() == 2) {
-        // one places of month validation
-        int onesPlace = Integer.parseInt(getText().subSequence(1, 2).toString());
-        if ((tensPlace == 1 && onesPlace > 2) || (tensPlace == 0 && onesPlace == 0)) {
-          return truncateAndIndicateInvalid(monthStr);
-        }
-      }
-      return monthStr;
-    }
+			} else if (!mTextAdded && (length() == 2)) {
 
-    private CharSequence validateYear(String yearStr) {
-      if (mTextAdded && yearStr.length() == 1) {
-        // tens place of year validation
-        Integer year = Calendar.getInstance().get(Calendar.YEAR);
-        int curTensPlace = Integer.parseInt(year.toString().substring(2, 3));
-        int inputTensPlace = Integer.parseInt(yearStr.substring(0, 1));
+				setText(getText().subSequence(0, 1));
+				setSelection(length());
 
-        if (inputTensPlace < curTensPlace) {
-          return truncateAndIndicateInvalid("");
-        }
+			}
+		}
 
-      } else if (mTextAdded && yearStr.length() == 2) {
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			mPrevLength = length();
+		}
 
-        // ones place of year validation
-        int curMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        int curYear = Calendar.getInstance().get(Calendar.YEAR) - 2000;
-        int inputYear = Integer.parseInt(yearStr);
-        if (!TextUtils.isEmpty(getMonth())) {
-          int inputMonth = Integer.parseInt(getMonth());
-          if (inputYear < curYear || ((inputMonth < curMonth) && inputYear == curYear)) {
-            return truncateAndIndicateInvalid(yearStr);
-          }
-        } else {
-          if (inputYear < curYear) {
-            return truncateAndIndicateInvalid(yearStr);
-          }
-        }
-      }
-      return yearStr;
-    }
-  };
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
+			if (length() - mPrevLength > 0) {
+				mTextAdded = true;
+			} else {
+				mTextAdded = false;
+			}
+		}
+	};
 
-  private CharSequence truncateAndIndicateInvalid(String string) {
-    indicateInvalidDate();
-    if (string != null && string.length() > 0) {
-      return string.subSequence(0, 1);
-    }
-    return "";
-  }
+	public String getMonth() {
+		String text = getText().toString();
+		int index = text.indexOf("/");
+		return text.substring(0, index);
+	}
 
-  public String getMonth() {
-    String text = getText().toString();
-    int index = text.indexOf("/");
-    if (index != -1) {
-      return text.substring(0, index);
-    } else {
-      return text;
-    }
-  }
+	public String getYear() {
+		String text = getText().toString();
+		int index = text.indexOf("/");
+		String yearStr = "20" + text.substring(index + 1, text.length());
+		return yearStr;
+	}
 
-  public String getYearAbv() {
-    String text = getText().toString();
-    int index = text.indexOf("/");
-    if (index != -1 && index + 1 < length()) {
-      return text.substring(index + 1);
-    } else {
-      return "";
-    }
-  }
+	@Override
+	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+		return new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
+	}
 
-  public String getYear() {
-    String text = getText().toString();
-    int index = text.indexOf("/");
-    String yearStr = "20" + text.substring(index + 1, text.length());
-    return yearStr;
-  }
+	/*
+	 * See "android EditText delete(backspace) key event" on stackoverflow
+	 */
+	private class ZanyInputConnection extends InputConnectionWrapper {
 
-  public boolean isValid() {
-    return getText().toString().length() == 5;
-  }
+		public ZanyInputConnection(InputConnection target, boolean mutable) {
+			super(target, mutable);
+		}
 
-  public void indicateInvalidDate() {
-    if (shakeAnim != null) shakeAnim.end();
-    shakeAnim = AnimUtils.getShakeAnimation(this, true);
-    shakeAnim.start();
-  }
+		@Override
+		public boolean sendKeyEvent(KeyEvent event) {
+			if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+				if (getSelectionStart() == 0) {
+					mListener.onCardNumberInputReEntry();
+				}
+			}
+			return super.sendKeyEvent(event);
+		}
 
-  public void setTextWithoutValidation(CharSequence text) {
-    removeTextChangedListener(mTextWatcher);
+		@Override
+		public boolean deleteSurroundingText(int beforeLength, int afterLength) {
+			// magic: in latest Android, deleteSurroundingText(1, 0) will be
+			// called for backspace
+			if (beforeLength == 1 && afterLength == 0) {
+				// backspace
+				return sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
+						&& sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
+			}
 
-    ViewUtils.replaceAllText(getText(), text);
+			return super.deleteSurroundingText(beforeLength, afterLength);
+		}
+	}
 
-    addTextChangedListener(mTextWatcher);
-  }
-
-  /////////////////
-  // Input Methods
-  /////////////////
-
-  @Override
-  public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
-    mInputConnection = new ZanyInputConnection(super.onCreateInputConnection(outAttrs), true);
-    return mInputConnection;
-  }
-
-  /**
-   * invoked when a hardware key event is dispatched to this view.
-   * We will make all calls to our input connection.
-   */
-  private class ZanyKeyListener implements OnKeyListener {
-
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-      boolean shouldConsume = false;
-      if (event.getAction() == KeyEvent.ACTION_DOWN && mInputConnection != null) {
-        switch (event.getKeyCode()) {
-          case KeyEvent.KEYCODE_DEL:
-            shouldConsume = mInputConnection.handleDelete();
-            break;
-          // On a hardware keyboard IME_ACTION_NEXT will come as an enter key.
-          case KeyEvent.KEYCODE_ENTER:
-            shouldConsume = true;
-            mInputConnection.performEditorAction(EditorInfo.IME_ACTION_NEXT);
-            break;
-        }
-      }
-      // soft-keyboard uses downs while hard uses ups.
-      return shouldConsume || event.getAction() == KeyEvent.ACTION_UP;
-    }
-  }
-
-  /*
-   * See "android EditText delete(backspace) key event" on stackoverflow
-   */
-  private class ZanyInputConnection extends InputConnectionWrapper {
-
-    public ZanyInputConnection(InputConnection target, boolean mutable) {
-      super(target, mutable);
-    }
-
-    @Override
-    public boolean sendKeyEvent(KeyEvent event) {
-      if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-        handleDelete();
-      }
-      return super.sendKeyEvent(event);
-    }
-
-    private boolean handleDelete() {
-      if (getSelectionEnd() == 0) {
-        mListener.onCardNumberInputReEntry();
-        return true;
-      }
-      int index = getText().toString().indexOf("/");
-      if (index != -1 && getSelectionEnd() == (index + 1) && length() == (index + 1)) {
-        removeTextChangedListener(mTextWatcher);
-        ViewUtils.replaceAllText(getText(), getText().toString().substring(0, length() - 1));
-        addTextChangedListener(mTextWatcher);
-      }
-      return false;
-    }
-
-    @Override
-    public boolean deleteSurroundingText(int beforeLength, int afterLength) {
-      // magic: in latest Android, deleteSurroundingText(1, 0) will be
-      // called for backspace
-      if (beforeLength == 1 && afterLength == 0) {
-        // backspace
-        return sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-                && sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
-      }
-
-      return super.deleteSurroundingText(beforeLength, afterLength);
-    }
-  }
 }

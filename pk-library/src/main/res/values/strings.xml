@@ -4,5 +4,4 @@
 	
 	<string name="pk_expiration_field_desc">Credit Card Expiration Field</string>
 	<string name="pk_expiration_field_hint">MM/YY</string>
-
 </resources>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?android:attr/editTextBackground">
 
     <com.paymentkit.views.CardNumHolder
         android:id="@+id/card_num_holder"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:layout_marginLeft="10dp"
@@ -26,26 +27,25 @@
         android:layout_height="50dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:addStatesFromChildren="true"
         android:orientation="horizontal" >
 
         <com.paymentkit.views.ExpirationEditText
             android:id="@+id/expiration"
-            style="@style/pk_CheckoutAddCardField"
+            style="@style/PKAddCardField"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:contentDescription="@string/pk_expiration_field_desc"
             android:hint="@string/pk_expiration_field_hint"
-            android:imeOptions="actionNext|flagNoExtractUi"
+            android:imeOptions="actionNext"
             android:inputType="number"
+            android:contentDescription="@string/pk_expiration_field_desc"
             android:maxLength="5"
-            android:textSize="@dimen/pk_checkout_input_field_text_size"
+            android:textSize="@dimen/pk_input_field_text_size"
             android:color="@color/pk_DKGRAY" />
 
         <com.paymentkit.views.CVVEditText
             android:id="@+id/security_code"
-            style="@style/pk_CheckoutAddCardField"
+            style="@style/PKAddCardField"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_gravity="center"
@@ -56,7 +56,7 @@
             android:inputType="number"
             android:maxLength="3"
             android:nextFocusRight="@null"
-            android:textSize="@dimen/pk_checkout_input_field_text_size"
+            android:textSize="@dimen/pk_input_field_text_size"
             android:color="@color/pk_DKGRAY" />
     </LinearLayout>
 
