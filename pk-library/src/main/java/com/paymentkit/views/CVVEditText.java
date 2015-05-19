@@ -42,7 +42,7 @@ public class CVVEditText extends EditText {
 
   private void setup() {
     addTextChangedListener(mTextWatcher);
-    setOnFocusChangeListener(mFocusListener);
+    //setOnFocusChangeListener(mFocusListener);
     setOnKeyListener(new ZanyKeyListener());
   }
 
