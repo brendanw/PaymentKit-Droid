@@ -1,4 +1,4 @@
-package com.paymentkit.views;
+package me.brendanweinstein.views;
 
 import android.content.Context;
 import android.util.AttributeSet;

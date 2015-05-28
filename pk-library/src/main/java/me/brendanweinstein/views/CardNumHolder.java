@@ -1,4 +1,4 @@
-package com.paymentkit.views;
+package me.brendanweinstein.views;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -13,10 +13,11 @@ import android.view.animation.CycleInterpolator;
 import android.widget.RelativeLayout;
 
 import com.paymentkit.R;
-import com.paymentkit.ValidateCreditCard;
-import com.paymentkit.util.ToastUtils;
-import com.paymentkit.util.ViewUtils;
-import com.paymentkit.views.FieldHolder.CardEntryListener;
+
+import me.brendanweinstein.ValidateCreditCard;
+import me.brendanweinstein.util.ToastUtils;
+import me.brendanweinstein.util.ViewUtils;
+import me.brendanweinstein.views.FieldHolder.CardEntryListener;
 
 public class CardNumHolder extends RelativeLayout {
 

@@ -1,4 +1,4 @@
-package com.paymentkit.views;
+package me.brendanweinstein.views;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -10,9 +10,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 
-import com.paymentkit.CardType;
 import com.paymentkit.R;
-import com.paymentkit.util.ViewUtils;
+
+import me.brendanweinstein.CardType;
+import me.brendanweinstein.util.ViewUtils;
 
 
 public class CardIcon extends FrameLayout {

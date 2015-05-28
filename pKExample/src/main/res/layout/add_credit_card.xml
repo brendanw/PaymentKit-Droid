@@ -55,7 +55,7 @@
         android:scaleType="fitXY"
         android:src="@drawable/pk_payment_icons" />
 
-    <com.paymentkit.views.FieldHolder
+    <me.brendanweinstein.views.FieldHolder
         android:id="@+id/field_holder"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
@@ -63,6 +63,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:background="?android:editTextBackground">
-    </com.paymentkit.views.FieldHolder>
+    </me.brendanweinstein.views.FieldHolder>
 
 </RelativeLayout>

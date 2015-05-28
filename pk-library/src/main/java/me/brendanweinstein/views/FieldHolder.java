@@ -1,4 +1,4 @@
-package com.paymentkit.views;
+package me.brendanweinstein.views;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -14,11 +14,11 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.paymentkit.CardType;
 import com.paymentkit.R;
-import com.paymentkit.ValidateCreditCard;
-import com.paymentkit.util.ViewUtils;
-import com.paymentkit.views.CardIcon.CardFace;
+
+import me.brendanweinstein.CardType;
+import me.brendanweinstein.ValidateCreditCard;
+import me.brendanweinstein.util.ViewUtils;
 
 /**
  * 
@@ -194,7 +194,7 @@ public class FieldHolder extends RelativeLayout {
 
 		@Override
 		public void onCardNumberInputReEntry() {
-			mCardIcon.flipTo(CardFace.FRONT);
+			mCardIcon.flipTo(CardIcon.CardFace.FRONT);
 			AnimatorSet set = new AnimatorSet();
 
 			mCardHolder.getCardField().setVisibility(View.VISIBLE);
@@ -223,14 +223,14 @@ public class FieldHolder extends RelativeLayout {
 
 		@Override
 		public void onCVVEntry() {
-			mCardIcon.flipTo(CardFace.BACK);
+			mCardIcon.flipTo(CardIcon.CardFace.BACK);
 			mCVVEditText.requestFocus();
 		}
 
 		@Override
 		public void onCVVEntryComplete() {
 			Log.d(TAG, "onCVVEntryComplete");
-			mCardIcon.flipTo(CardFace.FRONT);
+			mCardIcon.flipTo(CardIcon.CardFace.FRONT);
 			FieldHolder.this.requestFocus();
 			// complete
 		}
@@ -239,7 +239,7 @@ public class FieldHolder extends RelativeLayout {
 		public void onBackFromCVV() {
 			Log.d(TAG, "onBackFromCVV");
 			mExpirationEditText.requestFocus();
-			mCardIcon.flipTo(CardFace.FRONT);
+			mCardIcon.flipTo(CardIcon.CardFace.FRONT);
 		}
 
 	};

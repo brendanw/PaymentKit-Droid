@@ -2,7 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="?android:attr/editTextBackground">
 
-    <com.paymentkit.views.CardNumHolder
+    <me.brendanweinstein.views.CardNumHolder
         android:id="@+id/card_num_holder"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -11,7 +11,7 @@
         android:layout_toRightOf="@+id/card_icon"
         android:contentDescription="Credit Card Number Field" />
 
-    <com.paymentkit.views.CardIcon
+    <me.brendanweinstein.views.CardIcon
         android:id="@+id/card_icon"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
         android:layout_centerVertical="true"
         android:orientation="horizontal" >
 
-        <com.paymentkit.views.ExpirationEditText
+        <me.brendanweinstein.views.ExpirationEditText
             android:id="@+id/expiration"
             style="@style/PKAddCardField"
             android:layout_width="wrap_content"
@@ -43,7 +43,7 @@
             android:textSize="@dimen/pk_input_field_text_size"
             android:color="@color/pk_DKGRAY" />
 
-        <com.paymentkit.views.CVVEditText
+        <me.brendanweinstein.views.CVVEditText
             android:id="@+id/security_code"
             style="@style/PKAddCardField"
             android:layout_width="wrap_content"

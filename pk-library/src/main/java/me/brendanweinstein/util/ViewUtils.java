@@ -1,4 +1,4 @@
-package com.paymentkit.util;
+package me.brendanweinstein.util;
 
 import android.app.Activity;
 import android.content.Context;

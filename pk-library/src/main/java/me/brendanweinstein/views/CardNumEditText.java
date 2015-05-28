@@ -1,4 +1,4 @@
-package com.paymentkit.views;
+package me.brendanweinstein.views;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,7 +13,7 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
-import com.paymentkit.views.FieldHolder.CardEntryListener;
+import me.brendanweinstein.views.FieldHolder.CardEntryListener;
 
 public class CardNumEditText extends EditText {
 

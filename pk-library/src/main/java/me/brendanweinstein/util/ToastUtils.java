@@ -1,6 +1,4 @@
-package com.paymentkit.util;
-
-import com.paymentkit.R;
+package me.brendanweinstein.util;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.paymentkit.R;
+
 
 public class ToastUtils {
 

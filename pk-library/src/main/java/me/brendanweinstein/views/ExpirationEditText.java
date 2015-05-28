@@ -1,4 +1,4 @@
-package com.paymentkit.views;
+package me.brendanweinstein.views;
 
 import java.util.Calendar;
 
@@ -12,7 +12,7 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
-import com.paymentkit.views.FieldHolder.CardEntryListener;
+import me.brendanweinstein.views.FieldHolder.CardEntryListener;
 
 /**
  * 

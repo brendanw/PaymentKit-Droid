@@ -1,4 +1,4 @@
-package com.brendan.pkexample;
+package me.brendanweinstein.pkexample;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,9 +9,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.paymentkit.util.ToastUtils;
-import com.paymentkit.util.ViewUtils;
-import com.paymentkit.views.FieldHolder;
+import com.brendan.pkexample.R;
+
+import me.brendanweinstein.util.ToastUtils;
+import me.brendanweinstein.util.ViewUtils;
+import me.brendanweinstein.views.FieldHolder;
 
 /**
  * @author Brendan Weinstein
@@ -44,7 +46,7 @@ public class PKFragment extends Fragment {
       if (mFieldHolder.isFieldsValid()) {
         ToastUtils.showToast(getActivity(), "Valid credit card entry!");
       } else {
-        ToastUtils.showToast(getActivity(), getResources().getString(com.paymentkit.R.string.pk_error_invalid_card_no));
+        ToastUtils.showToast(getActivity(), getResources().getString(R.string.pk_error_invalid_card_no));
       }
     }
   };

@@ -1,4 +1,4 @@
-package com.paymentkit.util;
+package me.brendanweinstein.util;
 
 import android.graphics.Color;
 import android.view.animation.CycleInterpolator;

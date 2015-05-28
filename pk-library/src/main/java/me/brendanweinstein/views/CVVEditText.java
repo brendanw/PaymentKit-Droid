@@ -1,4 +1,4 @@
-package com.paymentkit.views;
+package me.brendanweinstein.views;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,8 +13,8 @@ import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.paymentkit.util.ViewUtils;
-import com.paymentkit.views.FieldHolder.CardEntryListener;
+import me.brendanweinstein.util.ViewUtils;
+import me.brendanweinstein.views.FieldHolder.CardEntryListener;
 
 public class CVVEditText extends EditText {
 	

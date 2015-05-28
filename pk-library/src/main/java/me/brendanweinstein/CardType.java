@@ -1,4 +1,4 @@
-package com.paymentkit;
+package me.brendanweinstein;
 
 public enum CardType {
 	VISA(1, "Visa", false, 3),

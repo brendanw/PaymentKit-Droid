@@ -1,9 +1,11 @@
-package com.brendan.pkexample;
+package me.brendanweinstein.pkexample;
 
+import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.view.Window;
+
+import com.brendan.pkexample.R;
 
 /**
  * 

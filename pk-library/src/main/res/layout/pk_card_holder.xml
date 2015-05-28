@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android" >
 
-	<com.paymentkit.views.CardNumEditText
+	<me.brendanweinstein.views.CardNumEditText
 		style="@style/PKAddCardField"
 		android:id="@+id/credit_card_no"
 		android:layout_width="fill_parent"
@@ -11,7 +11,7 @@
 		android:textSize="@dimen/pk_input_field_text_size"
 		android:maxLength="19" />
 
-	<com.paymentkit.views.InterceptEditText
+	<me.brendanweinstein.views.InterceptEditText
 		style="@style/PKAddCardField"
 		android:id="@+id/last_four_digits"
 		android:editable="false"

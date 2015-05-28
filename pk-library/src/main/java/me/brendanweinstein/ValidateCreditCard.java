@@ -1,4 +1,4 @@
-package com.paymentkit;
+package me.brendanweinstein;
 
 /*
  * [ValidateCreditCard.java]
