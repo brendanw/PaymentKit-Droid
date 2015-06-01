@@ -21,6 +21,7 @@ public enum CardType {
 		this.mVal = val;
 		this.mName = name;
 		this.mIsError = isError;
+		mMaxCVVLength = maxCVVLength;
 	}
 
 	public int getValue() {
